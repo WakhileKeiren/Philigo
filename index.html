@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhiliGo – Gamified TB Adherence App</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: linear-gradient(135deg, #e8f5f0 0%, #d4ede3 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 30px 16px;
+}
+.app-container {
+  max-width: 1280px;
+  width: 100%;
+  background: #fff;
+  border-radius: 32px;
+  box-shadow: 0 25px 60px rgba(0,60,40,0.15);
+  padding: 36px 40px 44px;
+  position: relative;
+  overflow: hidden;
+}
+.app-container::before {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:5px;
+  background: linear-gradient(90deg,#0f7b5a,#2ecc71,#0f7b5a);
+  background-size:200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0%,100% { background-position:0% 0%; }
+  50% { background-position:100% 0%; }
+}
+
+/* HEADER */
+.header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:16px;
+  padding-bottom:22px;
+  border-bottom:2px solid #e8f0ed;
+  margin-bottom:28px;
+}
+.brand { display:flex; align-items:center; gap:14px; }
+.brand-icon {
+  width:54px; height:54px;
+  background: linear-gradient(135deg,#0f7b5a,#1abc9c);
+  border-radius:16px;
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; font-size:28px; font-weight:900;
+  box-shadow: 0 8px 18px rgba(15,123,90,0.3);
+}
+.brand h1 { font-size:28px; font-weight:900; color:#0a2e25; }
+.brand h1 span { color:#0f7b5a; }
+.brand .tagline { font-size:13px; color:#5a7a6e; margin-top:2px; }
+.university-badge { text-align:right; font-size:12px; color:#2d4f42; line-height:1.5; }
+.university-badge strong { display:block; font-size:15px; color:#0a2e25; }
+
+/* LAYOUT */
+.demo-layout {
+  display:flex;
+  gap:36px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+
+/* PHONE */
+.phone-wrapper {
+  flex:0 0 340px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+.phone {
+  width:340px;
+  height:680px;
+  background:#0a1a15;
+  border-radius:44px;
+  padding:12px;
+  box-shadow: 0 25px 50px -8px rgba(0,0,0,0.4), inset 0 0 0 2px rgba(255,255,255,0.06);
+  position:relative;
+}
+.phone-screen {
+  width:100%; height:100%;
+  border-radius:34px;
+  background:#fff;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  position:relative;
+}
+.notch {
+  position:absolute; top:0; left:50%;
+  transform:translateX(-50%);
+  width:120px; height:26px;
+  background:#0a1a15;
+  border-radius:0 0 16px 16px;
+  z-index:20;
+}
+.status-bar {
+  display:flex;
+  justify-content:space-between;
+  padding:10px 22px 6px;
+  font-size:11px;
+  font-weight:600;
+  color:#1a2f27;
+  flex-shrink:0;
+}
+.app-screen {
+  flex:1;
+  padding:4px 14px 16px;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+}
+.app-screen::-webkit-scrollbar { width:3px; }
+.app-screen::-webkit-scrollbar-thumb { background:#0f7b5a; border-radius:10px; }
+
+/* MODE TOGGLE */
+.mode-toggle {
+  display:flex;
+  gap:6px;
+  background:#e8f0ed;
+  border-radius:30px;
+  padding:4px;
+  margin-bottom:12px;
+  flex-shrink:0;
+}
+.mode-toggle button {
+  flex:1;
+  border:none;
+  background:transparent;
+  padding:9px 8px;
+  border-radius:30px;
+  font-size:12px;
+  font-weight:700;
+  color:#2d4f42;
+  cursor:pointer;
+  transition:0.2s;
+  font-family:inherit;
+}
+.mode-toggle button.active {
+  background:#fff;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.07);
+  color:#0f7b5a;
+}
+
+/* CHILD MODE */
+.game-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+  flex-shrink:0;
+}
+.game-header .title { font-size:14px; font-weight:800; color:#0a2e25; }
+.coins {
+  background:#fef9e7;
+  padding:4px 12px;
+  border-radius:30px;
+  font-size:12px;
+  font-weight:700;
+  color:#d4a017;
+}
+.game-area {
+  background: linear-gradient(180deg,#d4f0e8,#b5e0d4);
+  border-radius:22px;
+  flex:1;
+  min-height:200px;
+  position:relative;
+  overflow:hidden;
+  margin-bottom:10px;
+  border:2px solid #c5ddd2;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.game-area:active { transform:scale(0.99); }
+.runner {
+  font-size:56px;
+  animation: bounce 1.2s ease-in-out infinite;
+  user-select:none;
+  position:relative;
+  z-index:2;
+}
+@keyframes bounce {
+  0%,100% { transform:translateY(0); }
+  50% { transform:translateY(-10px); }
+}
+.pill-float {
+  position:absolute;
+  font-size:26px;
+  animation: floatUp 3s ease-in forwards;
+  pointer-events:none;
+  opacity:0.9;
+}
+@keyframes floatUp {
+  0% { transform:translateY(60px) scale(0.6); opacity:0; }
+  20% { opacity:1; transform:translateY(20px) scale(1); }
+  80% { opacity:1; }
+  100% { transform:translateY(-80px) scale(1.2); opacity:0; }
+}
+@keyframes collectPop {
+  0% { transform:scale(1); opacity:1; }
+  100% { transform:scale(2.5); opacity:0; }
+}
+.streak {
+  display:flex;
+  align-items:center;
+  gap:5px;
+  font-size:12px;
+  font-weight:700;
+  color:#0f7b5a;
+}
+.pill-row {
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  margin:4px 0 10px;
+  flex-shrink:0;
+  flex-wrap:wrap;
+}
+.pill-item {
+  width:44px; height:44px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+  background:#eaf3ef;
+  border:2px solid #c5ddd2;
+  transition:0.15s;
+  cursor:pointer;
+  user-select:none;
+}
+.pill-item.collected {
+  background:#0f7b5a;
+  border-color:#0f7b5a;
+  color:#fff;
+  transform:scale(0.9);
+  opacity:0.55;
+  cursor:default;
+}
+.pill-item:not(.collected):hover {
+  transform:scale(1.08);
+  border-color:#0f7b5a;
+}
+.game-stats {
+  display:flex;
+  justify-content:space-between;
+  font-size:11px;
+  font-weight:700;
+  color:#1a3f32;
+  background:rgba(255,255,255,0.7);
+  padding:7px 14px;
+  border-radius:30px;
+  flex-shrink:0;
+  margin-top:auto;
+}
+.reminder {
+  background:#fef9e7;
+  border-radius:14px;
+  padding:8px 14px;
+  font-size:11px;
+  font-weight:600;
+  color:#7a6a1a;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:8px;
+  flex-shrink:0;
+  border:1px solid #f0e4b8;
+}
+
+/* PARENT MODE */
+.parent-mode {
+  display:none;
+  flex-direction:column;
+  gap:10px;
+  height:100%;
+}
+.parent-mode.active { display:flex; }
+.parent-tabs {
+  display:flex;
+  gap:5px;
+  background:#e8f0ed;
+  border-radius:16px;
+  padding:4px;
+  flex-shrink:0;
+}
+.parent-tabs button {
+  flex:1;
+  border:none;
+  background:transparent;
+  padding:8px 4px;
+  border-radius:13px;
+  font-size:11px;
+  font-weight:700;
+  color:#2d4f42;
+  cursor:pointer;
+  transition:0.2s;
+  font-family:inherit;
+}
+.parent-tabs button.active {
+  background:#fff;
+  color:#0f7b5a;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);
+}
+.parent-panel { flex:1; overflow-y:auto; }
+.parent-panel::-webkit-scrollbar { width:3px; }
+.parent-panel::-webkit-scrollbar-thumb { background:#0f7b5a; border-radius:10px; }
+.card {
+  background:#f8fbfa;
+  border-radius:16px;
+  padding:14px 16px;
+  border:1px solid #e0ece6;
+  margin-bottom:10px;
+}
+.card h4 {
+  font-size:12px;
+  font-weight:800;
+  color:#0a2e25;
+  margin-bottom:8px;
+}
+.card p, .card li {
+  font-size:11px;
+  color:#2d4f42;
+  line-height:1.5;
+}
+.card ul { padding-left:18px; margin:4px 0; }
+.badge {
+  display:inline-block;
+  padding:3px 12px;
+  border-radius:20px;
+  font-size:10px;
+  font-weight:700;
+  margin:3px 3px 0 0;
+}
+.badge.green { background:#d4f0e8; color:#0f7b5a; }
+.badge.red { background:#fde8e8; color:#b33c3c; }
+.badge.yellow { background:#fef9e7; color:#c97d0e; }
+.adherence-bar {
+  display:flex;
+  gap:4px;
+  margin:8px 0 4px;
+}
+.adherence-bar .day {
+  flex:1;
+  height:10px;
+  border-radius:6px;
+  background:#e0ece6;
+}
+.adherence-bar .day.done { background:#0f7b5a; }
+.adherence-bar .day.missed { background:#e07474; }
+.adherence-bar .day.today { border:2px solid #0f7b5a; background:#d4f0e8; }
+.days-label {
+  display:flex;
+  justify-content:space-between;
+  font-size:9px;
+  color:#5a7a6e;
+}
+
+/* REWARD POPUP */
+.reward-popup {
+  position:absolute;
+  top:50%; left:50%;
+  transform:translate(-50%,-50%) scale(0.8);
+  background:rgba(10,46,37,0.94);
+  padding:28px 24px;
+  border-radius:28px;
+  color:#fff;
+  text-align:center;
+  z-index:30;
+  opacity:0;
+  pointer-events:none;
+  transition:0.3s cubic-bezier(0.34,1.56,0.64,1);
+  width:80%;
+  max-width:240px;
+}
+.reward-popup.show {
+  opacity:1;
+  pointer-events:auto;
+  transform:translate(-50%,-50%) scale(1);
+}
+.reward-popup .big-icon { font-size:48px; margin-bottom:6px; }
+.reward-popup h3 { font-size:18px; font-weight:800; }
+.reward-popup p { font-size:13px; opacity:0.85; margin:4px 0 12px; }
+.reward-popup button {
+  background:#fff;
+  border:none;
+  padding:8px 26px;
+  border-radius:40px;
+  font-weight:700;
+  font-size:13px;
+  color:#0a2e25;
+  cursor:pointer;
+  font-family:inherit;
+}
+.reward-popup button:hover { transform:scale(1.04); }
+
+/* SIDEBAR */
+.info-sidebar {
+  flex:1;
+  min-width:260px;
+  max-width:420px;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+.info-card {
+  background:#f8fbfa;
+  border-radius:22px;
+  padding:20px 22px;
+  border:1px solid #e0ece6;
+}
+.info-card h3 {
+  font-size:17px;
+  font-weight:800;
+  color:#0a2e25;
+  margin-bottom:8px;
+}
+.info-card p, .info-card li {
+  font-size:13px;
+  color:#2d4f42;
+  line-height:1.6;
+}
+.info-card ul { padding-left:20px; margin:6px 0; }
+.highlight {
+  background:#eaf3ef;
+  padding:2px 10px;
+  border-radius:20px;
+  font-weight:700;
+  color:#0f7b5a;
+  display:inline-block;
+  font-size:12px;
+}
+.feature-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:8px;
+}
+.feat {
+  background:#fff;
+  border-radius:12px;
+  padding:10px 8px;
+  text-align:center;
+  font-size:11px;
+  font-weight:700;
+  color:#0a2e25;
+  border:1px solid #e0ece6;
+}
+.feat .emoji { display:block; font-size:20px; margin-bottom:3px; }
+.dark-card {
+  background:#0a2e25;
+  border-color:#1a4f3f;
+  color:#d4f0e8;
+}
+.dark-card h3 { color:#fff; }
+.dark-card p { color:#b5ddd0; }
+
+@media (max-width: 1024px) {
+  .app-container { padding:28px 22px; }
+  .demo-layout { flex-direction:column; align-items:center; }
+  .info-sidebar { max-width:100%; width:100%; }
+}
+@media (max-width: 480px) {
+  .app-container { padding:18px 12px; border-radius:22px; }
+  .phone { width:100%; max-width:320px; height:600px; padding:10px; border-radius:36px; }
+  .phone-screen { border-radius:28px; }
+  .brand h1 { font-size:22px; }
+  .header { flex-direction:column; align-items:flex-start; gap:10px; }
+  .university-badge { text-align:left; }
+  .game-area { min-height:140px; }
+}
+.hidden { display:none !important; }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand">
+      <div class="brand-icon">💊</div>
+      <div>
+        <h1>Phili<span>Go</span></h1>
+        <div class="tagline">🎮 Gamified TB Adherence for Children</div>
+      </div>
+    </div>
+    <div class="university-badge">
+      <strong>UNIVERSITY OF ESWATINI</strong>
+      Faculty of Health Sciences · GNS 328
+      <span style="display:block;margin-top:2px;">Wakhile K. Mavimbela · 202302847</span>
+    </div>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="demo-layout">
+
+    <!-- PHONE -->
+    <div class="phone-wrapper">
+      <div class="phone">
+        <div class="phone-screen">
+
+          <div class="notch"></div>
+
+          <div class="status-bar">
+            <span>09:41</span>
+            <span>📶 🔋</span>
+          </div>
+
+          <div class="app-screen">
+
+            <!-- MODE TOGGLE -->
+            <div class="mode-toggle">
+              <button class="active" id="btnChild">👦 Child</button>
+              <button id="btnParent">🩺 Parent / Provider</button>
+            </div>
+
+            <!-- CHILD MODE -->
+            <div id="childMode" style="display:flex;flex-direction:column;flex:1;">
+
+              <div class="game-header">
+                <span class="title">🏃 Pill Runner</span>
+                <span class="coins">⭐ <span id="coins">0</span></span>
+              </div>
+
+              <div class="game-area" id="gameArea">
+                <div class="runner">🏃</div>
+                <div id="pillContainer" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;"></div>
+              </div>
+
+              <div style="display:flex;justify-content:space-between;align-items:center;margin:4px 0 6px;">
+                <span style="font-size:11px;font-weight:700;color:#2d4f42;">Today's pills</span>
+                <span class="streak">🔥 <span id="streak">0</span> day streak</span>
+              </div>
+
+              <div class="pill-row" id="pillRow">
+                <div class="pill-item" data-i="0">💊</div>
+                <div class="pill-item" data-i="1">💊</div>
+                <div class="pill-item" data-i="2">💊</div>
+                <div class="pill-item" data-i="3">💊</div>
+                <div class="pill-item" data-i="4">💊</div>
+              </div>
+
+              <div class="game-stats">
+                <span>❤️ <span id="lives">3</span></span>
+                <span>🏆 Level <span id="level">1</span></span>
+                <span>📅 Day <span id="day">1</span></span>
+              </div>
+
+              <div class="reminder">
+                ⏰ Next reminder: <strong>2:00 PM</strong> — Take your pill!
+              </div>
+            </div>
+
+            <!-- PARENT MODE -->
+            <div id="parentMode" class="parent-mode">
+
+              <div class="parent-tabs">
+                <button class="active" data-tab="adherence">Adherence</button>
+                <button data-tab="education">Education</button>
+                <button data-tab="appointments">Appointments</button>
+              </div>
+
+              <div class="parent-panel">
+
+                <div id="tab-adherence">
+                  <div class="card">
+                    <h4>📈 Weekly Adherence</h4>
+                    <div style="display:flex;justify-content:space-between;font-size:11px;color:#2d4f42;">
+                      <span>This week: <strong>85%</strong></span>
+                      <span>Goal: 90%</span>
+                    </div>
+                    <div class="adherence-bar" id="adhBar">
+                      <div class="day done"></div>
+                      <div class="day done"></div>
+                      <div class="day done"></div>
+                      <div class="day missed"></div>
+                      <div class="day done"></div>
+                      <div class="day today"></div>
+                      <div class="day"></div>
+                    </div>
+                    <div class="days-label">
+                      <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span>
+                      <span>Fri</span><span>Sat</span><span>Sun</span>
+                    </div>
+                  </div>
+
+                  <div class="card">
+                    <h4>👧 Child Progress</h4>
+                    <p><strong>Thandi</strong> · 8 yrs · TB treatment day <strong>12</strong></p>
+                    <div style="margin-top:6px;">
+                      <span class="badge green">✅ 9 taken</span>
+                      <span class="badge red">⚠️ 1 missed</span>
+                      <span class="badge yellow">⭐ 15 coins</span>
+                    </div>
+                  </div>
+
+                  <div class="card">
+                    <h4>🔔 Alerts</h4>
+                    <ul>
+                      <li>Missed dose on Thursday — follow up</li>
+                      <li>Caregiver reported mild nausea</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div id="tab-education" class="hidden">
+                  <div class="card">
+                    <h4>📖 Side Effects &amp; Care</h4>
+                    <ul>
+                      <li><strong>Common:</strong> nausea, loss of appetite, rash</li>
+                      <li><strong>Urgent care:</strong> difficulty breathing, severe vomiting, jaundice</li>
+                      <li><strong>💡 Tip:</strong> Take with food to reduce stomach upset</li>
+                    </ul>
+                  </div>
+                  <div class="card">
+                    <h4>🤝 Supporting Your Child</h4>
+                    <p>Praise each dose taken. Use the app's rewards to celebrate milestones. Keep a calm, reassuring tone.</p>
+                  </div>
+                </div>
+
+                <div id="tab-appointments" class="hidden">
+                  <div class="card">
+                    <h4>📅 Next Appointment</h4>
+                    <p><strong>15 June 2026</strong> · 10:00 AM · Mbabane Clinic</p>
+                    <p style="font-size:11px;color:#5a7a6e;margin-top:2px;">Dr. Nkosi · TB Focal Person</p>
+                  </div>
+                  <div class="card">
+                    <h4>📞 Contact Provider</h4>
+                    <p>📱 +268 2404 1234</p>
+                    <p>✉️ tb.clinic@health.gov.sz</p>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- REWARD POPUP -->
+            <div class="reward-popup" id="rewardPopup">
+              <div class="big-icon">🎉</div>
+              <h3>Pill Collected!</h3>
+              <p id="rewardMsg">+1 coin · Keep going!</p>
+              <button id="closeReward">Awesome!</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <p style="margin-top:12px;font-size:12px;color:#5a7a6e;text-align:center;">
+        👆 Tap the game area or pills to collect
+      </p>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="info-sidebar">
+
+      <div class="info-card">
+        <h3>🚀 About PhiliGo</h3>
+        <p><strong>PhiliGo</strong> (from Siswati <em>"philisi"</em> — pill + "Go") is a gamified mobile app that transforms TB treatment into an engaging adventure for children aged <strong>6–15</strong>.</p>
+        <p style="margin-top:8px;">
+          <span class="highlight">🎯 20%</span> adherence target
+          <span class="highlight">📱 90.1%</span> Android share
+        </p>
+      </div>
+
+      <div class="info-card">
+        <h3>🎮 Game Features</h3>
+        <div class="feature-grid">
+          <div class="feat"><span class="emoji">🏃</span>Pill Runner</div>
+          <div class="feat"><span class="emoji">🧩</span>Puzzles</div>
+          <div class="feat"><span class="emoji">❓</span>Quizzes</div>
+          <div class="feat"><span class="emoji">⭐</span>Rewards</div>
+          <div class="feat"><span class="emoji">🔔</span>Reminders</div>
+          <div class="feat"><span class="emoji">📊</span>Tracking</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h3>👥 Stakeholders</h3>
+        <ul>
+          <li><strong>Ministry of Health</strong> — Sponsor</li>
+          <li><strong>Children &amp; families</strong> — Primary users</li>
+          <li><strong>Healthcare workers</strong> — Adherence monitoring</li>
+          <li><strong>ESCCOM</strong> — Regulatory</li>
+        </ul>
+      </div>
+
+      <div class="info-card dark-card">
+        <h3>📋 Project Snapshot</h3>
+        <p><strong>Budget:</strong> E450,000 · <strong>Timeline:</strong> 12 weeks<br>
+        <strong>Launch:</strong> Google Play Store · <strong>Target:</strong> 500+ downloads</p>
+        <div style="margin-top:10px;">
+          <span class="badge" style="background:#1a4f3f;color:#d4f0e8;">✅ Charter approved</span>
+          <span class="badge" style="background:#1a4f3f;color:#d4f0e8;">🚧 In development</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  // Element refs
+  var childMode = document.getElementById('childMode');
+  var parentMode = document.getElementById('parentMode');
+  var btnChild = document.getElementById('btnChild');
+  var btnParent = document.getElementById('btnParent');
+  var gameArea = document.getElementById('gameArea');
+  var pillContainer = document.getElementById('pillContainer');
+  var pillRow = document.getElementById('pillRow');
+  var coinsEl = document.getElementById('coins');
+  var livesEl = document.getElementById('lives');
+  var levelEl = document.getElementById('level');
+  var dayEl = document.getElementById('day');
+  var streakEl = document.getElementById('streak');
+  var rewardPopup = document.getElementById('rewardPopup');
+  var rewardMsg = document.getElementById('rewardMsg');
+  var closeReward = document.getElementById('closeReward');
+
+  // State
+  var state = {
+    coins: 0,
+    lives: 3,
+    level: 1,
+    day: 1,
+    streak: 0,
+    collected: [false,false,false,false,false],
+    mode: 'child',
+    spawnInterval: null,
+    popupTimeout: null
+  };
+
+  function updateUI() {
+    coinsEl.textContent = state.coins;
+    livesEl.textContent = state.lives;
+    levelEl.textContent = state.level;
+    dayEl.textContent = state.day;
+    streakEl.textContent = state.streak;
+
+    var items = pillRow.querySelectorAll('.pill-item');
+    for (var i = 0; i < items.length; i++) {
+      if (state.collected[i]) {
+        items[i].classList.add('collected');
+        items[i].textContent = '✅';
+      } else {
+        items[i].classList.remove('collected');
+        items[i].textContent = '💊';
+      }
+    }
+  }
+
+  function showReward(msg) {
+    rewardMsg.textContent = msg || '+1 coin · Keep going!';
+    rewardPopup.classList.add('show');
+    if (state.popupTimeout) clearTimeout(state.popupTimeout);
+    state.popupTimeout = setTimeout(function(){
+      rewardPopup.classList.remove('show');
+    }, 1800);
+  }
+
+  function collectPill(i) {
+    if (state.collected[i]) return;
+    state.collected[i] = true;
+    state.coins++;
+    state.streak++;
+
+    var totalCollected = state.collected.filter(function(v){ return v; }).length;
+    if (totalCollected % 5 === 0) {
+      state.level++;
+      showReward('🎉 Level up! Amazing!');
+    } else {
+      showReward('💊 Pill collected! +1 coin');
+    }
+
+    updateUI();
+
+    if (state.collected.every(function(v){ return v; })) {
+      setTimeout(function(){
+        showReward('🌟 All pills collected today!');
+      }, 400);
+    }
+  }
+
+  function spawnPill() {
+    if (state.mode !== 'child') return;
+    var el = document.createElement('div');
+    el.className = 'pill-float';
+    el.textContent = '💊';
+    el.style.left = (10 + Math.random() * 70) + '%';
+    el.style.top = (10 + Math.random() * 50) + '%';
+    el.style.fontSize = (20 + Math.floor(Math.random() * 16)) + 'px';
+    el.style.animationDuration = (2.5 + Math.random() * 2) + 's';
+    pillContainer.appendChild(el);
+    setTimeout(function(){
+      if (el.parentNode) el.parentNode.removeChild(el);
+    }, 4500);
+  }
+
+  function handleGameClick(e) {
+    if (state.mode !== 'child') return;
+    var idx = state.collected.indexOf(false);
+    if (idx === -1) {
+      showReward('🎯 All done! Come back tomorrow.');
+      return;
+    }
+    collectPill(idx);
+
+    // burst effect
+    var rect = gameArea.getBoundingClientRect();
+    var x = e.clientX - rect.left;
+    var y = e.clientY - rect.top;
+    var burst = document.createElement('div');
+    burst.textContent = '✨';
+    burst.style.position = 'absolute';
+    burst.style.left = x + 'px';
+    burst.style.top = y + 'px';
+    burst.style.fontSize = '30px';
+    burst.style.pointerEvents = 'none';
+    burst.style.animation = 'collectPop 0.5s ease forwards';
+    burst.style.zIndex = '10';
+    gameArea.appendChild(burst);
+    setTimeout(function(){
+      if (burst.parentNode) burst.parentNode.removeChild(burst);
+    }, 500);
+  }
+
+  function setMode(mode) {
+    state.mode = mode;
+    if (mode === 'child') {
+      childMode.style.display = 'flex';
+      parentMode.classList.remove('active');
+      btnChild.classList.add('active');
+      btnParent.classList.remove('active');
+      if (state.spawnInterval) clearInterval(state.spawnInterval);
+      state.spawnInterval = setInterval(spawnPill, 1800);
+    } else {
+      childMode.style.display = 'none';
+      parentMode.classList.add('active');
+      btnParent.classList.add('active');
+      btnChild.classList.remove('active');
+      if (state.spawnInterval) {
+        clearInterval(state.spawnInterval);
+        state.spawnInterval = null;
+      }
+      pillContainer.innerHTML = '';
+    }
+  }
+
+  // Parent tab switching
+  var tabButtons = document.querySelectorAll('.parent-tabs button');
+  var tabContents = {
+    adherence: document.getElementById('tab-adherence'),
+    education: document.getElementById('tab-education'),
+    appointments: document.getElementById('tab-appointments')
+  };
+
+  function switchTab(id) {
+    for (var i = 0; i < tabButtons.length; i++) {
+      tabButtons[i].classList.remove('active');
+    }
+    document.querySelector('.parent-tabs button[data-tab="' + id + '"]').classList.add('active');
+    for (var key in tabContents) {
+      if (tabContents.hasOwnProperty(key)) {
+        if (key === id) tabContents[key].classList.remove('hidden');
+        else tabContents[key].classList.add('hidden');
+      }
+    }
+  }
+
+  // Event listeners
+  gameArea.addEventListener('click', handleGameClick);
+
+  pillRow.addEventListener('click', function(e){
+    var item = e.target.closest ? e.target.closest('.pill-item') : null;
+    if (!item) {
+      // fallback for older browsers
+      var t = e.target;
+      while (t && t !== pillRow) {
+        if (t.classList && t.classList.contains('pill-item')) {
+          item = t;
+          break;
+        }
+        t = t.parentNode;
+      }
+    }
+    if (!item) return;
+    var idx = parseInt(item.getAttribute('data-i'), 10);
+    if (!isNaN(idx)) collectPill(idx);
+  });
+
+  btnChild.addEventListener('click', function(){ setMode('child'); });
+  btnParent.addEventListener('click', function(){ setMode('parent'); });
+
+  for (var i = 0; i < tabButtons.length; i++) {
+    (function(btn){
+      btn.addEventListener('click', function(){
+        switchTab(btn.getAttribute('data-tab'));
+      });
+    })(tabButtons[i]);
+  }
+
+  closeReward.addEventListener('click', function(){
+    rewardPopup.classList.remove('show');
+  });
+  rewardPopup.addEventListener('click', function(e){
+    if (e.target === rewardPopup) rewardPopup.classList.remove('show');
+  });
+
+  // Start
+  setMode('child');
+  updateUI();
+  setTimeout(spawnPill, 500);
+  setTimeout(spawnPill, 1400);
+
+  // Auto-reset for demo (every 30s if all collected)
+  setInterval(function(){
+    if (state.collected.every(function(v){ return v; })) {
+      state.collected = [false,false,false,false,false];
+      state.day++;
+      updateUI();
+      showReward('🌅 New day! Time for your pills!');
+    }
+  }, 30000);
+
+})();
+</script>
+
+</body>
+</html>
