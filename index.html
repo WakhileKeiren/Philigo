@@ -415,4 +415,14 @@
 <script src="js/games.js"></script>
   
 </body>
+  <script>
+window.onerror = function(msg, src, line, col, err) {
+  alert('ERROR: ' + msg + '\nAt: ' + src + ':' + line);
+  document.body.innerHTML = '<pre style="padding:20px;color:red;background:#fff;font-size:12px;">ERROR: ' + msg + '\n\n' + (err && err.stack ? err.stack : '') + '</pre>';
+};
+window.addEventListener('unhandledrejection', function(e) {
+  alert('PROMISE ERROR: ' + (e.reason && e.reason.message ? e.reason.message : e.reason));
+});
+</script>
+  
 </html>
