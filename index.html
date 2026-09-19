@@ -2,816 +2,326 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0f7b5a">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="PhiliGo">
-<title>PhiliGo – TB Adherence App</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<style>
-/* ============ RESET ============ */
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;overflow:hidden;}
-body{
-  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
-  background:#0a1a15;color:#0a2e25;
-  -webkit-font-smoothing:antialiased;
-  user-select:none;
-  overscroll-behavior:none;
-}
-button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
-input,textarea,select{font-family:inherit;font-size:16px;border:none;outline:none;background:none;color:inherit;}
-ul{list-style:none;}
-img{max-width:100%;display:block;}
-
-/* ============ APP SHELL ============ */
-#app{
-  max-width:480px;margin:0 auto;height:100vh;
-  background:#f4faf7;position:relative;
-  display:flex;flex-direction:column;overflow:hidden;
-  box-shadow:0 0 60px rgba(0,0,0,0.3);
-}
-
-/* ============ SCREENS ============ */
-.screen{
-  position:absolute;inset:0;
-  display:none;flex-direction:column;
-  background:#f4faf7;
-  overflow-y:auto;overflow-x:hidden;
-  padding-bottom:80px;
-  animation:slideIn .3s ease;
-}
-.screen.active{display:flex;}
-.screen::-webkit-scrollbar{width:0;}
-@keyframes slideIn{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);}}
-
-/* ============ TOP BAR ============ */
-.topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:16px 20px 12px;background:#f4faf7;
-  position:sticky;top:0;z-index:10;
-  border-bottom:1px solid #e0ece6;
-}
-.topbar h2{font-size:18px;font-weight:800;color:#0a2e25;}
-.topbar .back-btn{
-  width:38px;height:38px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  background:#eaf3ef;color:#0f7b5a;font-size:20px;font-weight:700;
-  transition:.15s;
-}
-.topbar .back-btn:active{transform:scale(.92);}
-.topbar .right-slot{display:flex;gap:8px;align-items:center;}
-.icon-btn{
-  width:38px;height:38px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  background:#eaf3ef;font-size:17px;transition:.15s;
-}
-.icon-btn:active{transform:scale(.92);}
-
-/* ============ SPLASH / ONBOARDING ============ */
-#splash{
-  position:fixed;inset:0;z-index:9999;
-  background:linear-gradient(160deg,#0f7b5a,#0a2e25);
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  color:#fff;text-align:center;padding:30px;
-  transition:opacity .5s;
-}
-#splash.hide{opacity:0;pointer-events:none;}
-.splash-logo{
-  font-size:80px;margin-bottom:16px;
-  animation:pulse 1.5s ease-in-out infinite;
-}
-@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.1);}}
-#splash h1{font-size:42px;font-weight:900;letter-spacing:-1px;margin-bottom:6px;}
-#splash h1 span{color:#2ecc71;}
-#splash .splash-tag{font-size:14px;opacity:.9;margin-bottom:40px;}
-.splash-loader{
-  width:200px;height:4px;background:rgba(255,255,255,.2);
-  border-radius:4px;overflow:hidden;
-}
-.splash-loader::after{
-  content:'';display:block;height:100%;width:40%;
-  background:#2ecc71;border-radius:4px;
-  animation:load 1.4s ease-in-out infinite;
-}
-@keyframes load{0%{transform:translateX(-100%);}100%{transform:translateX(350%);}}
-
-/* ============ ONBOARDING ============ */
-#onboarding{
-  position:fixed;inset:0;z-index:9000;
-  background:#f4faf7;display:none;
-  flex-direction:column;padding:40px 26px;
-  max-width:480px;margin:0 auto;
-}
-#onboarding.active{display:flex;}
-#onboarding .ob-step{display:none;flex-direction:column;flex:1;animation:slideIn .3s;}
-#onboarding .ob-step.active{display:flex;}
-#onboarding h2{font-size:26px;font-weight:900;color:#0a2e25;margin-bottom:10px;line-height:1.2;}
-#onboarding p{font-size:15px;color:#4d6b60;line-height:1.5;margin-bottom:24px;}
-#onboarding .field{margin-bottom:18px;}
-#onboarding label{display:block;font-size:13px;font-weight:700;color:#0f7b5a;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;}
-#onboarding input{
-  width:100%;padding:16px 18px;background:#eaf3ef;
-  border-radius:14px;font-size:16px;color:#0a2e25;font-weight:600;
-  border:2px solid transparent;transition:.2s;
-}
-#onboarding input:focus{border-color:#0f7b5a;background:#fff;}
-#onboarding .ob-btns{margin-top:auto;display:flex;gap:10px;}
-.btn-primary{
-  flex:1;padding:16px;border-radius:16px;
-  background:linear-gradient(135deg,#0f7b5a,#1abc9c);
-  color:#fff;font-weight:700;font-size:16px;
-  box-shadow:0 8px 20px rgba(15,123,90,.3);
-  transition:.15s;
-}
-.btn-primary:active{transform:scale(.97);}
-.btn-ghost{
-  padding:16px 24px;border-radius:16px;
-  background:#eaf3ef;color:#0f7b5a;font-weight:700;font-size:16px;
-}
-.avatar-grid{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;
-}
-.avatar-opt{
-  aspect-ratio:1;border-radius:20px;background:#eaf3ef;
-  display:flex;align-items:center;justify-content:center;
-  font-size:32px;border:3px solid transparent;transition:.15s;
-}
-.avatar-opt.selected{border-color:#0f7b5a;background:#d4f0e8;transform:scale(1.05);}
-.avatar-opt:active{transform:scale(.95);}
-.progress-dots{display:flex;gap:8px;justify-content:center;margin-bottom:30px;}
-.progress-dots .dot{width:8px;height:8px;border-radius:50%;background:#d0e3db;transition:.3s;}
-.progress-dots .dot.active{background:#0f7b5a;width:24px;border-radius:8px;}
-
-/* ============ HOME (CHILD) ============ */
-.home-hero{
-  background:linear-gradient(150deg,#0f7b5a,#1abc9c);
-  border-radius:0 0 32px 32px;
-  padding:24px 24px 70px;
-  color:#fff;position:relative;margin-bottom:-50px;
-}
-.home-hero .greeting{font-size:14px;opacity:.85;font-weight:500;}
-.home-hero .name{font-size:26px;font-weight:900;margin-top:2px;}
-.home-hero .avatar-big{
-  position:absolute;right:24px;top:50%;transform:translateY(-50%);
-  width:64px;height:64px;border-radius:50%;
-  background:rgba(255,255,255,.2);backdrop-filter:blur(10px);
-  display:flex;align-items:center;justify-content:center;
-  font-size:34px;border:2px solid rgba(255,255,255,.3);
-}
-.stats-row{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
-  padding:0 20px;margin-bottom:20px;position:relative;z-index:2;
-}
-.stat-card{
-  background:#fff;border-radius:18px;padding:14px 8px;
-  text-align:center;box-shadow:0 6px 18px rgba(15,123,90,.1);
-}
-.stat-card .stat-icon{font-size:22px;margin-bottom:4px;}
-.stat-card .stat-val{font-size:20px;font-weight:900;color:#0a2e25;}
-.stat-card .stat-lbl{font-size:10px;color:#7a9a8d;font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-top:2px;}
-
-.section-title{
-  font-size:14px;font-weight:800;color:#0a2e25;
-  padding:0 20px;margin:24px 0 12px;display:flex;
-  justify-content:space-between;align-items:center;
-}
-.section-title .see-all{font-size:12px;color:#0f7b5a;font-weight:700;}
-
-/* Today's Pills */
-.pills-today{
-  display:flex;gap:8px;padding:0 20px;margin-bottom:8px;
-}
-.pill-slot{
-  flex:1;aspect-ratio:1;border-radius:16px;
-  background:#fff;border:2px dashed #c5ddd2;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  font-size:9px;color:#7a9a8d;font-weight:700;
-  transition:.2s;position:relative;
-}
-.pill-slot .pill-emoji{font-size:22px;margin-bottom:2px;filter:grayscale(1);opacity:.4;}
-.pill-slot.taken{
-  background:linear-gradient(135deg,#0f7b5a,#1abc9c);
-  border-style:solid;border-color:#0f7b5a;color:#fff;
-}
-.pill-slot.taken .pill-emoji{filter:none;opacity:1;}
-.pill-slot.taken::after{
-  content:'✓';position:absolute;top:-6px;right:-6px;
-  width:22px;height:22px;border-radius:50%;
-  background:#2ecc71;color:#fff;font-size:13px;font-weight:900;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 3px 8px rgba(46,204,113,.4);
-}
-
-/* Progress Ring */
-.progress-card{
-  margin:0 20px 16px;background:#fff;border-radius:22px;
-  padding:20px;box-shadow:0 6px 18px rgba(15,123,90,.08);
-  display:flex;align-items:center;gap:16px;
-}
-.ring{
-  width:78px;height:78px;border-radius:50%;flex-shrink:0;
-  background:conic-gradient(#0f7b5a 0deg, #0f7b5a var(--p,0deg), #e0ece6 var(--p,0deg));
-  display:flex;align-items:center;justify-content:center;
-  position:relative;transition:.5s;
-}
-.ring::before{
-  content:'';position:absolute;inset:8px;border-radius:50%;background:#fff;
-}
-.ring span{position:relative;font-size:18px;font-weight:900;color:#0f7b5a;}
-.progress-card .txt h4{font-size:15px;font-weight:800;color:#0a2e25;margin-bottom:3px;}
-.progress-card .txt p{font-size:12px;color:#5a7a6e;line-height:1.4;}
-
-/* Quick Actions */
-.quick-actions{
-  display:grid;grid-template-columns:repeat(2,1fr);gap:10px;
-  padding:0 20px;margin-bottom:20px;
-}
-.action-card{
-  border-radius:20px;padding:18px 16px;color:#fff;
-  display:flex;flex-direction:column;gap:4px;
-  transition:.15s;text-align:left;
-}
-.action-card:active{transform:scale(.97);}
-.action-card .ac-icon{font-size:30px;margin-bottom:6px;}
-.action-card .ac-title{font-size:14px;font-weight:800;}
-.action-card .ac-sub{font-size:11px;opacity:.9;}
-.ac-game{background:linear-gradient(135deg,#f39c12,#e67e22);}
-.ac-puzzle{background:linear-gradient(135deg,#9b59b6,#8e44ad);}
-.ac-quiz{background:linear-gradient(135deg,#3498db,#2980b9);}
-.ac-rewards{background:linear-gradient(135deg,#e74c3c,#c0392b);}
-
-/* Reminder Card */
-.reminder-card{
-  margin:0 20px 20px;background:#fef9e7;
-  border:1.5px solid #f0e4b8;border-radius:18px;
-  padding:14px 16px;display:flex;align-items:center;gap:12px;
-}
-.reminder-card .rc-icon{font-size:24px;}
-.reminder-card .rc-txt{flex:1;}
-.reminder-card .rc-txt strong{font-size:13px;color:#7a6a1a;display:block;}
-.reminder-card .rc-txt span{font-size:11px;color:#9a8a3a;}
-
-/* ============ GAME SCREEN ============ */
-.game-shell{
-  flex:1;display:flex;flex-direction:column;
-  background:#87ceeb;position:relative;overflow:hidden;
-}
-#gameCanvas{
-  position:absolute;inset:0;width:100%;height:100%;touch-action:none;
-}
-.game-hud{
-  position:absolute;top:0;left:0;right:0;
-  padding:14px 18px;display:flex;justify-content:space-between;
-  z-index:5;pointer-events:none;
-}
-.hud-pill{
-  background:rgba(0,0,0,.5);backdrop-filter:blur(10px);
-  color:#fff;padding:6px 14px;border-radius:20px;
-  font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;
-}
-.game-overlay{
-  position:absolute;inset:0;background:rgba(10,46,37,.85);
-  backdrop-filter:blur(10px);display:none;
-  flex-direction:column;align-items:center;justify-content:center;
-  color:#fff;text-align:center;padding:30px;z-index:20;
-}
-.game-overlay.active{display:flex;}
-.game-overlay h2{font-size:30px;font-weight:900;margin-bottom:8px;}
-.game-overlay p{font-size:15px;opacity:.9;margin-bottom:24px;line-height:1.5;}
-.game-overlay .score-big{font-size:56px;font-weight:900;color:#2ecc71;margin-bottom:6px;}
-.game-overlay .btn-primary{max-width:240px;}
-
-/* ============ PUZZLE SCREEN ============ */
-.puzzle-wrap{flex:1;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.puzzle-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
-  width:100%;max-width:340px;aspect-ratio:1;
-  background:#eaf3ef;border-radius:20px;padding:12px;
-  margin-bottom:20px;
-}
-.puzzle-tile{
-  background:linear-gradient(135deg,#0f7b5a,#1abc9c);
-  border-radius:14px;display:flex;align-items:center;justify-content:center;
-  font-size:28px;font-weight:900;color:#fff;
-  transition:.2s;cursor:pointer;
-  box-shadow:0 4px 12px rgba(15,123,90,.2);
-}
-.puzzle-tile.empty{background:transparent;box-shadow:none;}
-.puzzle-tile:not(.empty):active{transform:scale(.94);}
-.puzzle-tile.correct{background:linear-gradient(135deg,#2ecc71,#27ae60);}
-
-/* ============ QUIZ SCREEN ============ */
-.quiz-wrap{flex:1;padding:20px;display:flex;flex-direction:column;}
-.quiz-progress{
-  height:6px;background:#e0ece6;border-radius:6px;overflow:hidden;
-  margin-bottom:20px;flex-shrink:0;
-}
-.quiz-progress .bar{height:100%;background:linear-gradient(90deg,#0f7b5a,#2ecc71);width:0%;transition:.4s;border-radius:6px;}
-.quiz-card{
-  background:#fff;border-radius:22px;padding:24px;
-  box-shadow:0 6px 20px rgba(15,123,90,.08);
-  margin-bottom:20px;flex-shrink:0;
-}
-.quiz-card .q-num{font-size:12px;color:#0f7b5a;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
-.quiz-card .q-text{font-size:17px;font-weight:700;color:#0a2e25;line-height:1.5;}
-.quiz-options{display:flex;flex-direction:column;gap:10px;}
-.quiz-opt{
-  padding:16px 20px;background:#fff;border-radius:16px;
-  text-align:left;font-size:14px;font-weight:600;color:#0a2e25;
-  border:2px solid #e0ece6;transition:.2s;
-  display:flex;align-items:center;gap:12px;
-}
-.quiz-opt:active{transform:scale(.98);}
-.quiz-opt .letter{
-  width:28px;height:28px;border-radius:50%;background:#eaf3ef;
-  color:#0f7b5a;font-weight:800;font-size:13px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-}
-.quiz-opt.correct{background:#d4f0e8;border-color:#0f7b5a;color:#0f7b5a;}
-.quiz-opt.correct .letter{background:#0f7b5a;color:#fff;}
-.quiz-opt.wrong{background:#fde8e8;border-color:#e07474;color:#b33c3c;}
-.quiz-opt.wrong .letter{background:#e07474;color:#fff;}
-
-/* ============ REWARDS SCREEN ============ */
-.rewards-header{
-  background:linear-gradient(150deg,#e74c3c,#c0392b);
-  padding:30px 24px;color:#fff;text-align:center;
-  border-radius:0 0 32px 32px;margin-bottom:20px;
-}
-.rewards-header .big-coin{font-size:56px;margin-bottom:6px;}
-.rewards-header h2{font-size:28px;font-weight:900;}
-.rewards-header p{font-size:13px;opacity:.9;margin-top:4px;}
-.badges-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
-  padding:0 20px;
-}
-.badge-item{
-  aspect-ratio:1;border-radius:20px;background:#fff;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:8px;text-align:center;box-shadow:0 4px 12px rgba(15,123,90,.06);
-  transition:.2s;border:2px solid transparent;
-}
-.badge-item.locked{opacity:.4;filter:grayscale(1);}
-.badge-item.unlocked{border-color:#f39c12;background:#fff8e7;}
-.badge-item .bi-icon{font-size:32px;margin-bottom:4px;}
-.badge-item .bi-name{font-size:9px;font-weight:800;color:#0a2e25;line-height:1.2;}
-
-/* ============ PARENT MODE ============ */
-.pin-screen{
-  flex:1;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;padding:30px;
-}
-.pin-screen h2{font-size:22px;font-weight:900;color:#0a2e25;margin-bottom:6px;}
-.pin-screen p{font-size:14px;color:#5a7a6e;margin-bottom:30px;text-align:center;}
-.pin-dots{display:flex;gap:14px;margin-bottom:32px;}
-.pin-dots .pd{
-  width:16px;height:16px;border-radius:50%;
-  background:#d0e3db;transition:.2s;
-}
-.pin-dots .pd.filled{background:#0f7b5a;transform:scale(1.15);}
-.pin-pad{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
-  width:100%;max-width:280px;
-}
-.pin-key{
-  aspect-ratio:1;border-radius:50%;
-  background:#eaf3ef;font-size:22px;font-weight:800;color:#0a2e25;
-  display:flex;align-items:center;justify-content:center;
-  transition:.15s;
-}
-.pin-key:active{transform:scale(.92);background:#0f7b5a;color:#fff;}
-.pin-key.del{font-size:18px;background:#fde8e8;color:#b33c3c;}
-.pin-error{color:#e07474;font-size:13px;font-weight:600;margin-top:16px;min-height:20px;}
-
-/* Parent Dashboard */
-.parent-welcome{
-  background:linear-gradient(150deg,#2c3e50,#34495e);
-  padding:24px;color:#fff;border-radius:0 0 32px 32px;margin-bottom:20px;
-}
-.parent-welcome h2{font-size:22px;font-weight:900;}
-.parent-welcome p{font-size:13px;opacity:.8;margin-top:4px;}
-.tab-bar{
-  display:flex;gap:6px;background:#eaf3ef;border-radius:16px;
-  padding:5px;margin:0 20px 18px;
-}
-.tab-bar button{
-  flex:1;padding:10px 0;border-radius:12px;
-  font-size:11px;font-weight:700;color:#5a7a6e;
-  transition:.2s;
-}
-.tab-bar button.active{background:#fff;color:#0f7b5a;box-shadow:0 3px 10px rgba(0,0,0,.06);}
-.tab-content{display:none;padding:0 20px;animation:slideIn .3s;}
-.tab-content.active{display:block;}
-
-/* Adherence */
-.week-grid{
-  display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:20px;
-}
-.week-day{
-  aspect-ratio:1;border-radius:12px;background:#eaf3ef;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  font-size:9px;font-weight:700;color:#5a7a6e;gap:2px;
-}
-.week-day .wd-letter{font-size:10px;text-transform:uppercase;}
-.week-day .wd-dot{width:8px;height:8px;border-radius:50%;background:#c5ddd2;}
-.week-day.done{background:#d4f0e8;color:#0f7b5a;}
-.week-day.done .wd-dot{background:#0f7b5a;}
-.week-day.missed{background:#fde8e8;color:#b33c3c;}
-.week-day.missed .wd-dot{background:#e07474;}
-
-.stat-panel{
-  background:#fff;border-radius:20px;padding:18px;
-  margin-bottom:14px;box-shadow:0 4px 14px rgba(15,123,90,.06);
-}
-.stat-panel h4{font-size:14px;font-weight:800;color:#0a2e25;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
-.stat-rows{display:flex;flex-direction:column;gap:10px;}
-.stat-row{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:10px 12px;background:#f4faf7;border-radius:12px;
-}
-.stat-row .sr-lbl{font-size:12px;color:#2d4f42;font-weight:600;}
-.stat-row .sr-val{font-size:14px;font-weight:800;color:#0f7b5a;}
-.stat-row .sr-val.red{color:#c0392b;}
-
-/* Education */
-.edu-card{
-  background:#fff;border-radius:20px;padding:18px;
-  margin-bottom:14px;box-shadow:0 4px 14px rgba(15,123,90,.06);
-}
-.edu-card h4{font-size:14px;font-weight:800;color:#0a2e25;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
-.edu-card ul{padding-left:18px;}
-.edu-card li{font-size:13px;color:#2d4f42;line-height:1.7;margin-bottom:4px;}
-.edu-card .danger-item{color:#b33c3c;font-weight:600;}
-.edu-card .tip-box{
-  background:#fef9e7;border-radius:12px;padding:10px 14px;
-  font-size:12px;color:#7a6a1a;margin-top:10px;font-weight:600;
-}
-
-/* Appointments */
-.apt-card{
-  background:#fff;border-radius:20px;padding:18px;
-  margin-bottom:14px;box-shadow:0 4px 14px rgba(15,123,90,.06);
-  display:flex;gap:14px;align-items:flex-start;
-}
-.apt-date{
-  background:#eaf3ef;border-radius:14px;padding:10px 12px;
-  text-align:center;flex-shrink:0;
-}
-.apt-date .ad-day{font-size:22px;font-weight:900;color:#0f7b5a;line-height:1;}
-.apt-date .ad-mon{font-size:10px;font-weight:700;color:#5a7a6e;text-transform:uppercase;margin-top:2px;}
-.apt-info{flex:1;}
-.apt-info h4{font-size:14px;font-weight:800;color:#0a2e25;margin-bottom:4px;}
-.apt-info p{font-size:12px;color:#5a7a6e;line-height:1.5;}
-.apt-info .badge-apt{
-  display:inline-block;padding:2px 10px;border-radius:20px;
-  background:#d4f0e8;color:#0f7b5a;font-size:10px;
-  font-weight:700;margin-top:6px;
-}
-
-/* ============ BOTTOM NAV ============ */
-.bottom-nav{
-  position:absolute;bottom:0;left:0;right:0;
-  background:#fff;border-top:1px solid #e0ece6;
-  display:flex;padding:8px 0 max(8px, env(safe-area-inset-bottom));
-  z-index:50;box-shadow:0 -4px 20px rgba(0,0,0,.04);
-}
-.nav-btn{
-  flex:1;display:flex;flex-direction:column;align-items:center;
-  gap:3px;padding:6px 0;color:#a0b8ac;transition:.2s;
-}
-.nav-btn .nav-icon{font-size:22px;}
-.nav-btn .nav-lbl{font-size:10px;font-weight:700;}
-.nav-btn.active{color:#0f7b5a;}
-.nav-btn.active .nav-icon{transform:translateY(-2px);}
-
-/* ============ MODAL ============ */
-.modal-back{
-  position:fixed;inset:0;background:rgba(10,46,37,.6);
-  backdrop-filter:blur(6px);z-index:200;
-  display:none;align-items:center;justify-content:center;padding:24px;
-}
-.modal-back.active{display:flex;animation:fadeIn .2s;}
-@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-.modal{
-  background:#fff;border-radius:28px;padding:28px 24px;
-  max-width:340px;width:100%;text-align:center;
-  animation:pop .3s cubic-bezier(.34,1.56,.64,1);
-}
-@keyframes pop{from{transform:scale(.85);opacity:0;}to{transform:scale(1);opacity:1;}}
-.modal .modal-icon{font-size:64px;margin-bottom:10px;}
-.modal h3{font-size:22px;font-weight:900;color:#0a2e25;margin-bottom:6px;}
-.modal p{font-size:14px;color:#5a7a6e;line-height:1.5;margin-bottom:20px;}
-.modal .modal-btns{display:flex;gap:10px;}
-
-/* ============ TOAST ============ */
-#toast{
-  position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);
-  background:rgba(10,46,37,.95);color:#fff;
-  padding:12px 22px;border-radius:30px;
-  font-size:13px;font-weight:700;z-index:9000;
-  opacity:0;pointer-events:none;transition:.3s;
-  box-shadow:0 8px 24px rgba(0,0,0,.3);
-  max-width:90vw;text-align:center;
-}
-#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-
-/* ============ UTILS ============ */
-.hidden{display:none!important;}
-.text-green{color:#0f7b5a!important;}
-.text-red{color:#c0392b!important;}
-.mt-8{margin-top:8px;}
-.mb-8{margin-bottom:8px;}
-
-/* ============ RESPONSIVE ============ */
-@media (min-width:481px){
-  body{background:#0a2e25;}
-}
-</style>
+<meta name="description" content="Gamified TB treatment adherence app for children in Eswatini">
+<title>PhiliGo — TB Adherence Adventure</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
-<!-- ================= SPLASH ================= -->
-<div id="splash">
-  <div class="splash-logo">💊</div>
-  <h1>Phili<span>Go</span></h1>
-  <div class="splash-tag">🎮 Gamified TB Adherence · Eswatini 🇸🇿</div>
-  <div class="splash-loader"></div>
+<!-- SPLASH -->
+<div id="splash" class="splash">
+  <div class="splash__icon">💊</div>
+  <h1 class="splash__title">Phili<span>Go</span></h1>
+  <p class="splash__tag">Your TB Adventure Awaits!</p>
+  <div class="splash__loader"><span></span></div>
 </div>
 
-<!-- ================= ONBOARDING ================= -->
-<div id="onboarding">
-  <!-- Step 1: Welcome -->
-  <div class="ob-step active" data-step="0">
-    <div class="progress-dots"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
-    <h2>Welcome to PhiliGo! 👋</h2>
-    <p>Let's set up your adventure. We'll ask a few quick questions to personalize your experience.</p>
-    <div style="margin-top:auto"><button class="btn-primary" onclick="nextObStep()">Get Started →</button></div>
+<!-- ONBOARDING -->
+<div id="onboard" class="onboard">
+  <div class="onboard__step" data-step="0">
+    <div class="dots"><span class="active"></span><span></span><span></span></div>
+    <div class="onboard__hero">🦁</div>
+    <h2>Hi there, hero! 👋</h2>
+    <p>I'm <strong>Phili</strong> — your TB treatment buddy. Together we'll collect pills, beat levels, and stay strong!</p>
+    <div class="onboard__note">
+      <strong>⚕️ Note:</strong> PhiliGo helps you remember your medicine. Always listen to your nurse and parents!
+    </div>
+    <button class="btn btn--primary" onclick="ob.next()">Let's Go! 🚀</button>
   </div>
 
-  <!-- Step 2: Name + Age -->
-  <div class="ob-step" data-step="1">
-    <div class="progress-dots"><span class="dot"></span><span class="dot active"></span><span class="dot"></span></div>
-    <h2>What's your name? 📝</h2>
-    <p>We'll use this to cheer you on!</p>
-    <div class="field">
-      <label>Your Name</label>
-      <input type="text" id="obName" placeholder="e.g. Thandi" maxlength="20" autocomplete="off">
-    </div>
-    <div class="field">
-      <label>Your Age</label>
-      <input type="number" id="obAge" placeholder="e.g. 8" min="6" max="15">
-    </div>
-    <div class="ob-btns">
-      <button class="btn-ghost" onclick="prevObStep()">Back</button>
-      <button class="btn-primary" onclick="obStep2()">Next →</button>
+  <div class="onboard__step" data-step="1">
+    <div class="dots"><span></span><span class="active"></span><span></span></div>
+    <h2>What's your name?</h2>
+    <p>Your hero name.</p>
+    <label class="field">
+      <span>Hero Name</span>
+      <input id="obName" placeholder="e.g. Sipho" maxlength="20" autocomplete="given-name">
+    </label>
+    <label class="field">
+      <span>Age</span>
+      <input id="obAge" type="number" min="6" max="15" placeholder="8" inputmode="numeric">
+    </label>
+    <div class="onboard__btns">
+      <button class="btn btn--ghost" onclick="ob.prev()">Back</button>
+      <button class="btn btn--primary" onclick="ob.step2()">Next →</button>
     </div>
   </div>
 
-  <!-- Step 3: Avatar + PIN -->
-  <div class="ob-step" data-step="2">
-    <div class="progress-dots"><span class="dot"></span><span class="dot"></span><span class="dot active"></span></div>
-    <h2>Pick your avatar! 🎭</h2>
-    <p>Choose your hero and set a PIN for your parent's mode.</p>
-    <div class="avatar-grid" id="avatarGrid">
-      <div class="avatar-opt selected" data-avatar="🦁">🦁</div>
-      <div class="avatar-opt" data-avatar="🐘">🐘</div>
-      <div class="avatar-opt" data-avatar="🦒">🦒</div>
-      <div class="avatar-opt" data-avatar="🦓">🦓</div>
-      <div class="avatar-opt" data-avatar="🐆">🐆</div>
-      <div class="avatar-opt" data-avatar="🦏">🦏</div>
-      <div class="avatar-opt" data-avatar="🦛">🦛</div>
-      <div class="avatar-opt" data-avatar="🐃">🐃</div>
-    </div>
-    <div class="field">
-      <label>Parent PIN (4 digits)</label>
-      <input type="tel" id="obPin" placeholder="1234" maxlength="4" pattern="[0-9]*" inputmode="numeric">
-    </div>
-    <div class="ob-btns">
-      <button class="btn-ghost" onclick="prevObStep()">Back</button>
-      <button class="btn-primary" onclick="finishOnboarding()">Start Playing! 🚀</button>
+  <div class="onboard__step" data-step="2">
+    <div class="dots"><span></span><span></span><span class="active"></span></div>
+    <h2>Pick your hero! 🎭</h2>
+    <p>Choose your animal companion.</p>
+    <div id="avatarGrid" class="avatar-grid"></div>
+    <label class="field">
+      <span>Parent PIN (4 digits)</span>
+      <input id="obPin" type="tel" maxlength="4" inputmode="numeric" placeholder="1234">
+      <small>Used to open the parent dashboard</small>
+    </label>
+    <div class="onboard__btns">
+      <button class="btn btn--ghost" onclick="ob.prev()">Back</button>
+      <button class="btn btn--primary" onclick="ob.finish()">Start Playing! 🎮</button>
     </div>
   </div>
 </div>
 
-<!-- ================= MAIN APP ================= -->
-<div id="app">
+<!-- MAIN APP -->
+<div id="app" class="app">
 
-  <!-- ===== CHILD HOME ===== -->
-  <section class="screen active" id="screen-home">
-    <div class="home-hero">
-      <div class="greeting">Hello,</div>
-      <div class="name" id="homeName">Friend</div>
-      <div class="avatar-big" id="homeAvatar">🦁</div>
-    </div>
-
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-icon">⭐</div><div class="stat-val" id="statCoins">0</div><div class="stat-lbl">Coins</div></div>
-      <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-val" id="statStreak">0</div><div class="stat-lbl">Streak</div></div>
-      <div class="stat-card"><div class="stat-icon">🏆</div><div class="stat-val" id="statLevel">1</div><div class="stat-lbl">Level</div></div>
-    </div>
+  <!-- ============ SCREEN: HOME ============ -->
+  <section class="screen screen--active" id="sc-home">
+    <header class="home-header">
+      <div class="home-header__row">
+        <div>
+          <div class="home-header__greet">Hello, hero!</div>
+          <div class="home-header__name" id="homeName">Friend</div>
+        </div>
+        <div class="home-header__avatar" id="homeAvatar">🦁</div>
+      </div>
+      <div class="home-header__stats">
+        <div class="stat-bubble"><span>⭐</span><span id="statCoins">0</span></div>
+        <div class="stat-bubble"><span>🔥</span><span id="statStreak">0</span></div>
+        <div class="stat-bubble"><span>🏆</span><span id="statLevel">1</span></div>
+      </div>
+    </header>
 
     <div class="progress-card">
-      <div class="ring" id="progressRing"><span id="progressPct">0%</span></div>
-      <div class="txt">
+      <div class="progress-ring" id="progRing">
+        <span id="progPct">0%</span>
+      </div>
+      <div class="progress-card__txt">
         <h4>Treatment Journey</h4>
-        <p id="treatmentDay">Day 1 of 180 · Keep it up! 💪</p>
+        <p id="treatInfo">Day 1 of 180</p>
       </div>
     </div>
 
-    <div class="section-title">
-      <span>💊 Today's Pills</span>
-      <span class="see-all" id="pillsCount">0/4</span>
+    <div class="section-head">
+      <h3>💊 Today's Medicine</h3>
+      <span class="pill-count" id="pillCount">0/3</span>
     </div>
     <div class="pills-today" id="pillsToday"></div>
 
-    <div class="reminder-card">
-      <div class="rc-icon">⏰</div>
-      <div class="rc-txt">
+    <div class="reminder-banner" id="reminderBanner">
+      <span class="reminder-banner__ico">⏰</span>
+      <div class="reminder-banner__txt">
         <strong id="nextReminder">Next dose at 2:00 PM</strong>
-        <span>We'll remind you on time!</span>
+        <span>Don't forget your pill!</span>
       </div>
     </div>
 
-    <div class="section-title"><span>🎮 Play & Learn</span></div>
-    <div class="quick-actions">
-      <button class="action-card ac-game" onclick="navigate('game')">
-        <div class="ac-icon">🏃</div>
-        <div class="ac-title">Pill Runner</div>
-        <div class="ac-sub">Collect pills!</div>
+    <div class="section-head"><h3>🎮 Games</h3></div>
+    <div class="games-grid">
+      <button class="game-card game-card--orange" onclick="nav.go('game-runner')">
+        <span class="game-card__ico">🏃</span>
+        <span class="game-card__name">Pill Runner</span>
+        <span class="game-card__sub">Endless runner</span>
+        <span class="game-card__hi">Best: <span id="hi-runner">0</span></span>
       </button>
-      <button class="action-card ac-puzzle" onclick="navigate('puzzle')">
-        <div class="ac-icon">🧩</div>
-        <div class="ac-title">Puzzle</div>
-        <div class="ac-sub">Solve & earn</div>
+      <button class="game-card game-card--purple" onclick="nav.go('game-match')">
+        <span class="game-card__ico">🧩</span>
+        <span class="game-card__name">Pill Match</span>
+        <span class="game-card__sub">Match 3+</span>
+        <span class="game-card__hi">Best: <span id="hi-match">0</span></span>
       </button>
-      <button class="action-card ac-quiz" onclick="navigate('quiz')">
-        <div class="ac-icon">❓</div>
-        <div class="ac-title">Quiz</div>
-        <div class="ac-sub">Test your TB IQ</div>
+      <button class="game-card game-card--blue" onclick="nav.go('game-memory')">
+        <span class="game-card__ico">🎴</span>
+        <span class="game-card__name">Memory Cards</span>
+        <span class="game-card__sub">Find the pairs</span>
+        <span class="game-card__hi">Best: <span id="hi-memory">0</span></span>
       </button>
-      <button class="action-card ac-rewards" onclick="navigate('rewards')">
-        <div class="ac-icon">🏅</div>
-        <div class="ac-title">Rewards</div>
-        <div class="ac-sub">Your badges</div>
+      <button class="game-card game-card--red" onclick="nav.go('game-quiz')">
+        <span class="game-card__ico">❓</span>
+        <span class="game-card__name">TB Quiz</span>
+        <span class="game-card__sub">Test your brain</span>
+        <span class="game-card__hi">Best: <span id="hi-quiz">0</span></span>
       </button>
     </div>
+
+    <div class="section-head">
+      <h3>🏅 Achievements</h3>
+      <span class="see-all" onclick="nav.go('rewards')">See all ›</span>
+    </div>
+    <div class="badges-mini" id="miniBadges"></div>
   </section>
 
-  <!-- ===== GAME (RUNNER) ===== -->
-  <section class="screen" id="screen-game">
-    <div class="topbar">
-      <button class="back-btn" onclick="navigate('home')">←</button>
-      <h2>🏃 Pill Runner</h2>
-      <div class="right-slot"><span style="font-size:14px;font-weight:800;color:#0f7b5a;">⭐ <span id="gameCoins">0</span></span></div>
-    </div>
-    <div class="game-shell" id="gameShell">
-      <canvas id="gameCanvas"></canvas>
+  <!-- ============ SCREEN: RUNNER ============ -->
+  <section class="screen" id="sc-game-runner">
+    <div class="game-shell">
       <div class="game-hud">
-        <div class="hud-pill">⭐ <span id="hudCoins">0</span></div>
-        <div class="hud-pill">💊 <span id="hudPills">0</span></div>
+        <button class="game-hud__back" onclick="nav.go('home')">←</button>
+        <div class="game-hud__stats">
+          <span class="hud-chip">⭐ <span id="runnerCoins">0</span></span>
+          <span class="hud-chip">💊 <span id="runnerPills">0</span></span>
+        </div>
       </div>
-      <div class="game-overlay" id="gameStart">
-        <div style="font-size:70px;margin-bottom:10px;">🏃‍♂️</div>
+      <canvas id="runnerCanvas"></canvas>
+      <div class="game-overlay game-overlay--active" id="runnerStart">
+        <div class="game-overlay__ico">🏃</div>
         <h2>Pill Runner</h2>
-        <p>Collect pills 💊 to earn coins!<br>Tap left/right to move.<br>Avoid obstacles! ⚡</p>
-        <button class="btn-primary" onclick="startGame()">Start Running 🏁</button>
+        <p>Collect pills 💊 &nbsp;·&nbsp; Dodge obstacles ⚡<br>Tap or use arrow keys</p>
+        <button class="btn btn--primary" onclick="Runner.start()">Start Run 🏁</button>
+        <p class="game-overlay__hint">Controls: Tap left/right of screen or use ← → keys</p>
       </div>
-      <div class="game-overlay" id="gameOver">
-        <div style="font-size:60px;margin-bottom:8px;">🏁</div>
+      <div class="game-overlay" id="runnerOver">
+        <div class="game-overlay__ico">🏁</div>
         <h2>Great run!</h2>
-        <div class="score-big" id="finalScore">0</div>
-        <p>You collected <strong id="finalPills">0</strong> pills!</p>
-        <button class="btn-primary" onclick="startGame()">Play Again 🔁</button>
+        <div class="game-overlay__score" id="runnerFinalScore">0</div>
+        <p>Pills collected: <strong id="runnerFinalPills">0</strong></p>
+        <div class="game-overlay__btns">
+          <button class="btn btn--ghost" onclick="Runner.stopAndGoHome()">Home</button>
+          <button class="btn btn--primary" onclick="Runner.start()">Play Again 🔁</button>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ===== PUZZLE ===== -->
-  <section class="screen" id="screen-puzzle">
-    <div class="topbar">
-      <button class="back-btn" onclick="navigate('home')">←</button>
-      <h2>🧩 Pill Puzzle</h2>
-      <div class="right-slot"><span style="font-size:14px;font-weight:800;color:#0f7b5a;">Moves: <span id="puzzleMoves">0</span></span></div>
-    </div>
-    <div class="puzzle-wrap">
-      <p style="text-align:center;color:#5a7a6e;font-size:13px;margin-bottom:20px;">
-        Arrange the numbers in order (1–8). Tap a tile next to the empty space!
-      </p>
-      <div class="puzzle-grid" id="puzzleGrid"></div>
-      <button class="btn-ghost" onclick="initPuzzle()" style="width:100%;max-width:340px;">🔄 Shuffle</button>
-    </div>
-  </section>
-
-  <!-- ===== QUIZ ===== -->
-  <section class="screen" id="screen-quiz">
-    <div class="topbar">
-      <button class="back-btn" onclick="navigate('home')">←</button>
-      <h2>❓ TB Quiz</h2>
-      <div class="right-slot"><span style="font-size:14px;font-weight:800;color:#0f7b5a;">⭐ <span id="quizScore">0</span></span></div>
-    </div>
-    <div class="quiz-wrap">
-      <div class="quiz-progress"><div class="bar" id="quizBar"></div></div>
-      <div class="quiz-card">
-        <div class="q-num" id="qNum">Question 1 of 5</div>
-        <div class="q-text" id="qText">Loading...</div>
+  <!-- ============ SCREEN: MATCH-3 ============ -->
+  <section class="screen" id="sc-game-match">
+    <div class="game-shell game-shell--light">
+      <div class="game-hud game-hud--dark">
+        <button class="game-hud__back" onclick="nav.go('home')">←</button>
+        <div class="game-hud__stats">
+          <span class="hud-chip">⭐ <span id="matchScore">0</span></span>
+          <span class="hud-chip">🎯 <span id="matchMoves">0</span></span>
+        </div>
       </div>
-      <div class="quiz-options" id="quizOptions"></div>
+      <div class="match-wrap">
+        <div class="match-grid" id="matchGrid"></div>
+        <div class="match-actions">
+          <button class="btn btn--ghost" onclick="Match3.restart()">🔄 New Game</button>
+          <button class="btn btn--primary" onclick="Match3.hint()">💡 Hint (-5⭐)</button>
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- ===== REWARDS ===== -->
-  <section class="screen" id="screen-rewards">
+  <!-- ============ SCREEN: MEMORY ============ -->
+  <section class="screen" id="sc-game-memory">
+    <div class="game-shell game-shell--light">
+      <div class="game-hud game-hud--dark">
+        <button class="game-hud__back" onclick="nav.go('home')">←</button>
+        <div class="game-hud__stats">
+          <span class="hud-chip">⭐ <span id="memScore">0</span></span>
+          <span class="hud-chip">🎯 <span id="memMoves">0</span></span>
+        </div>
+      </div>
+      <div class="memory-wrap">
+        <div class="memory-grid" id="memoryGrid"></div>
+        <div class="memory-info">
+          <span>Pairs found: <strong id="memPairs">0</strong>/8</span>
+          <span>Time: <strong id="memTime">0:00</strong></span>
+        </div>
+        <button class="btn btn--primary" onclick="Memory.restart()">🔄 New Game</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN: QUIZ ============ -->
+  <section class="screen" id="sc-game-quiz">
+    <div class="game-shell game-shell--light">
+      <div class="game-hud game-hud--dark">
+        <button class="game-hud__back" onclick="nav.go('home')">←</button>
+        <div class="game-hud__stats">
+          <span class="hud-chip">⭐ <span id="quizScore">0</span></span>
+          <span class="hud-chip">Q <span id="quizQNum">1</span>/10</span>
+        </div>
+      </div>
+      <div class="quiz-wrap">
+        <div class="quiz-progress"><div class="quiz-progress__bar" id="quizBar"></div></div>
+        <div class="quiz-card">
+          <div class="quiz-card__num">Question <span id="quizNumText">1</span></div>
+          <div class="quiz-card__q" id="quizQ">Loading...</div>
+        </div>
+        <div class="quiz-options" id="quizOptions"></div>
+        <div class="quiz-feedback" id="quizFeedback"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN: REWARDS ============ -->
+  <section class="screen" id="sc-rewards">
     <div class="topbar">
-      <button class="back-btn" onclick="navigate('home')">←</button>
-      <h2>🏅 Rewards</h2>
-      <div class="right-slot"></div>
+      <button class="topbar__back" onclick="nav.go('home')">←</button>
+      <h2>🏅 Achievements</h2>
+      <div class="topbar__spacer"></div>
     </div>
     <div class="rewards-header">
-      <div class="big-coin">⭐</div>
+      <div class="rewards-header__ico">🏆</div>
       <h2 id="rewardCoins">0 Coins</h2>
-      <p>Keep collecting to unlock more!</p>
+      <p>Keep playing & taking medicine!</p>
     </div>
-    <div class="section-title"><span>🏆 Achievements</span></div>
     <div class="badges-grid" id="badgesGrid"></div>
-    <div style="height:20px;"></div>
   </section>
 
-  <!-- ===== PARENT PIN GATE ===== -->
-  <section class="screen" id="screen-pin">
+  <!-- ============ SCREEN: PARENT PIN ============ -->
+  <section class="screen" id="sc-pin">
     <div class="topbar">
-      <button class="back-btn" onclick="navigate('home')">←</button>
+      <button class="topbar__back" onclick="nav.go('home')">←</button>
       <h2>🔒 Parent Access</h2>
-      <div class="right-slot"></div>
+      <div class="topbar__spacer"></div>
     </div>
     <div class="pin-screen">
-      <div style="font-size:60px;margin-bottom:12px;">🔐</div>
+      <div class="pin-screen__ico">🔐</div>
       <h2>Enter Parent PIN</h2>
-      <p>This area is for parents and healthcare providers only.</p>
+      <p>For parents & healthcare providers</p>
       <div class="pin-dots" id="pinDots">
-        <div class="pd"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div>
+        <span></span><span></span><span></span><span></span>
       </div>
       <div class="pin-pad" id="pinPad"></div>
       <div class="pin-error" id="pinError"></div>
     </div>
   </section>
 
-  <!-- ===== PARENT DASHBOARD ===== -->
-  <section class="screen" id="screen-parent">
+  <!-- ============ SCREEN: PARENT DASH ============ -->
+  <section class="screen" id="sc-parent">
     <div class="topbar">
-      <button class="back-btn" onclick="navigate('home')">←</button>
+      <button class="topbar__back" onclick="nav.go('home')">←</button>
       <h2>👨‍👩‍👧 Parent Dashboard</h2>
-      <div class="right-slot">
-        <button class="icon-btn" onclick="lockParent()">🔒</button>
-      </div>
+      <button class="topbar__lock" onclick="Parent.lock()">🔒</button>
     </div>
-
     <div class="parent-welcome">
-      <h2>Hello, Parent 👋</h2>
-      <p>Monitoring <strong id="parentChildName">your child</strong>'s TB treatment</p>
+      <h2>Hello, Caregiver 👋</h2>
+      <p>Monitoring <strong id="parentChildName">your child</strong></p>
     </div>
 
-    <div class="tab-bar">
-      <button class="active" data-tab="adherence" onclick="switchParentTab('adherence')">📊 Adherence</button>
-      <button data-tab="education" onclick="switchParentTab('education')">📖 Education</button>
-      <button data-tab="appointments" onclick="switchParentTab('appointments')">📅 Appointments</button>
+    <div class="parent-tabs">
+      <button class="active" data-tab="adherence" onclick="Parent.tab('adherence')">📊 Adherence</button>
+      <button data-tab="education" onclick="Parent.tab('education')">📖 Learn</button>
+      <button data-tab="appointments" onclick="Parent.tab('appointments')">📅 Visits</button>
     </div>
 
-    <!-- Adherence Tab -->
-    <div class="tab-content active" id="tab-adherence">
+    <div class="parent-tab active" id="tab-adherence">
+      <div class="week-grid" id="weekGrid"></div>
       <div class="stat-panel">
-        <h4>📅 This Week</h4>
-        <div class="week-grid" id="weekGrid"></div>
-      </div>
-      <div class="stat-panel">
-        <h4>📈 Overall Statistics</h4>
+        <h4>📈 Statistics</h4>
         <div class="stat-rows">
-          <div class="stat-row"><span class="sr-lbl">Adherence rate</span><span class="sr-val" id="adherenceRate">0%</span></div>
-          <div class="stat-row"><span class="sr-lbl">Total pills taken</span><span class="sr-val" id="totalPillsTaken">0</span></div>
-          <div class="stat-row"><span class="sr-lbl">Current streak</span><span class="sr-val" id="parentStreak">0 days</span></div>
-          <div class="stat-row"><span class="sr-lbl">Missed doses</span><span class="sr-val red" id="missedDoses">0</span></div>
-          <div class="stat-row"><span class="sr-lbl">Treatment day</span><span class="sr-val" id="parentDay">1 of 180</span></div>
+          <div class="stat-row"><span>Adherence rate</span><strong id="pAdhRate">0%</strong></div>
+          <div class="stat-row"><span>Total pills taken</span><strong id="pTotal">0</strong></div>
+          <div class="stat-row"><span>Current streak</span><strong id="pStreak">0 days</strong></div>
+          <div class="stat-row"><span>Missed doses</span><strong class="red" id="pMissed">0</strong></div>
+          <div class="stat-row"><span>Treatment day</span><strong id="pDay">1 / 180</strong></div>
         </div>
       </div>
       <div class="stat-panel">
-        <h4>🔔 Recent Alerts</h4>
-        <div class="stat-rows" id="alertsList">
-          <div class="stat-row"><span class="sr-lbl">✅ All caught up!</span></div>
-        </div>
+        <h4>🔔 Alerts</h4>
+        <div id="parentAlerts"></div>
       </div>
     </div>
 
-    <!-- Education Tab -->
-    <div class="tab-content" id="tab-education">
+    <div class="parent-tab" id="tab-education">
       <div class="edu-card">
         <h4>💊 About TB Treatment</h4>
         <ul>
-          <li>Treatment lasts <strong>6 months</strong> (180 days) for drug-sensitive TB</li>
-          <li>Pills must be taken <strong>every day</strong> at the same time</li>
-          <li>Never skip a dose — TB can become resistant</li>
-          <li>Missing doses can make treatment fail</li>
+          <li>TB treatment lasts <strong>6 months (180 days)</strong></li>
+          <li>Pills must be taken <strong>every single day</strong></li>
+          <li>Never skip doses — TB can become resistant</li>
+          <li>Missing doses can cause treatment failure</li>
         </ul>
       </div>
       <div class="edu-card">
@@ -820,841 +330,97 @@ img{max-width:100%;display:block;}
           <li>Nausea or upset stomach</li>
           <li>Loss of appetite</li>
           <li>Mild skin rash</li>
-          <li>Orange/red urine (from rifampicin — normal!)</li>
+          <li>Orange/red urine (normal — from rifampicin)</li>
           <li>Tiredness</li>
         </ul>
-        <div class="tip-box">💡 Tip: Give pills with food to reduce stomach upset</div>
+        <div class="tip-box">💡 Give pills with food to reduce stomach upset</div>
       </div>
-      <div class="edu-card">
-        <h4>🚨 When to Seek Urgent Care</h4>
+      <div class="edu-card edu-card--danger">
+        <h4>🚨 Seek Urgent Care</h4>
         <ul>
-          <li class="danger-item">Difficulty breathing</li>
-          <li class="danger-item">Severe vomiting (can't keep pills down)</li>
-          <li class="danger-item">Yellowing of eyes or skin (jaundice)</li>
-          <li class="danger-item">Severe rash or swelling</li>
-          <li class="danger-item">Confusion or severe headache</li>
+          <li>Difficulty breathing</li>
+          <li>Severe vomiting (can't keep pills down)</li>
+          <li>Yellowing of eyes or skin (jaundice)</li>
+          <li>Severe rash or swelling</li>
+          <li>Confusion or severe headache</li>
         </ul>
-        <div class="tip-box" style="background:#fde8e8;color:#b33c3c;">🚨 Call your clinic immediately if any of these occur!</div>
+        <div class="tip-box tip-box--danger">🚨 Call your clinic immediately if any occur!</div>
       </div>
       <div class="edu-card">
         <h4>🤝 Supporting Your Child</h4>
         <ul>
-          <li>Praise every dose taken — celebrate small wins</li>
-          <li>Use the PhiliGo app together during pill time</li>
-          <li>Keep a calm, reassuring tone</li>
-          <li>Link pill time to a daily routine (e.g., after breakfast)</li>
-          <li>Never punish for missed doses — encourage instead</li>
+          <li>Praise every dose taken — celebrate wins</li>
+          <li>Play PhiliGo together during pill time</li>
+          <li>Link pill time to a daily routine</li>
+          <li>Never punish for missed doses — encourage</li>
         </ul>
       </div>
     </div>
 
-    <!-- Appointments Tab -->
-    <div class="tab-content" id="tab-appointments">
-      <div class="apt-card">
-        <div class="apt-date"><div class="ad-day">15</div><div class="ad-mon">Jun</div></div>
-        <div class="apt-info">
+    <div class="parent-tab" id="tab-appointments">
+      <div class="appt-card">
+        <div class="appt-card__date"><span>15</span><small>Jun</small></div>
+        <div class="appt-card__info">
           <h4>Monthly Check-up</h4>
           <p>10:00 AM · Mbabane TB Clinic<br>Dr. Nkosi · Room 4</p>
-          <span class="badge-apt">⏰ In 3 days</span>
+          <span class="appt-card__badge">⏰ In 3 days</span>
         </div>
       </div>
-      <div class="apt-card">
-        <div class="apt-date"><div class="ad-day">22</div><div class="ad-mon">Jul</div></div>
-        <div class="apt-info">
+      <div class="appt-card">
+        <div class="appt-card__date"><span>22</span><small>Jul</small></div>
+        <div class="appt-card__info">
           <h4>Sputum Test</h4>
           <p>09:00 AM · Mbabane TB Clinic<br>Bring sample container</p>
-          <span class="badge-apt" style="background:#fef9e7;color:#c97d0e;">📋 Bring sample</span>
+          <span class="appt-card__badge appt-card__badge--amber">📋 Bring sample</span>
         </div>
       </div>
-      <div class="stat-panel" style="margin-top:20px;">
-        <h4>📞 Contact Your Provider</h4>
+      <div class="stat-panel">
+        <h4>📞 Contact Provider</h4>
         <div class="stat-rows">
-          <div class="stat-row"><span class="sr-lbl">📱 Phone</span><span class="sr-val">+268 2404 1234</span></div>
-          <div class="stat-row"><span class="sr-lbl">✉️ Email</span><span class="sr-val" style="font-size:11px;">tb.clinic@health.gov.sz</span></div>
-          <div class="stat-row"><span class="sr-lbl">🚨 Emergency</span><span class="sr-val red">+268 2404 9999</span></div>
+          <div class="stat-row"><span>📱 Phone</span><strong>+268 2404 1234</strong></div>
+          <div class="stat-row"><span>✉️ Email</span><strong style="font-size:11px;">tb.clinic@health.gov.sz</strong></div>
+          <div class="stat-row"><span>🚨 Emergency</span><strong class="red">+268 2404 9999</strong></div>
         </div>
       </div>
     </div>
-
-    <div style="height:20px;"></div>
   </section>
 
-  <!-- ===== BOTTOM NAV ===== -->
+  <!-- ============ BOTTOM NAV ============ -->
   <nav class="bottom-nav" id="bottomNav">
-    <button class="nav-btn active" data-nav="home" onclick="navigate('home')">
-      <span class="nav-icon">🏠</span><span class="nav-lbl">Home</span>
+    <button class="nav-btn nav-btn--active" data-nav="home" onclick="nav.go('home')">
+      <span class="nav-btn__ico">🏠</span><span class="nav-btn__lbl">Home</span>
     </button>
-    <button class="nav-btn" data-nav="game" onclick="navigate('game')">
-      <span class="nav-icon">🎮</span><span class="nav-lbl">Play</span>
+    <button class="nav-btn" data-nav="rewards" onclick="nav.go('rewards')">
+      <span class="nav-btn__ico">🏅</span><span class="nav-btn__lbl">Rewards</span>
     </button>
-    <button class="nav-btn" data-nav="rewards" onclick="navigate('rewards')">
-      <span class="nav-icon">🏅</span><span class="nav-lbl">Rewards</span>
-    </button>
-    <button class="nav-btn" data-nav="pin" onclick="navigate('pin')">
-      <span class="nav-icon">👨‍👩‍👧</span><span class="nav-lbl">Parent</span>
+    <button class="nav-btn" data-nav="pin" onclick="nav.go('pin')">
+      <span class="nav-btn__ico">👨‍👩‍👧</span><span class="nav-btn__lbl">Parent</span>
     </button>
   </nav>
-
 </div>
 
-<!-- ================= MODAL ================= -->
-<div class="modal-back" id="modalBack">
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<!-- MODAL -->
+<div id="modal" class="modal-back">
   <div class="modal">
-    <div class="modal-icon" id="modalIcon">🎉</div>
+    <div class="modal__ico" id="modalIco">🎉</div>
     <h3 id="modalTitle">Great job!</h3>
     <p id="modalMsg">Keep it up!</p>
-    <div class="modal-btns">
-      <button class="btn-primary" id="modalBtn" onclick="closeModal()">OK</button>
-    </div>
+    <button class="btn btn--primary btn--full" onclick="ui.closeModal()">Awesome!</button>
   </div>
 </div>
 
-<!-- ================= TOAST ================= -->
-<div id="toast"></div>
-
+<script src="js/app.js"></script>
+<script src="js/games.js"></script>
 <script>
-/* =========================================================
-   PHILIGO – FULL APP
-   ========================================================= */
-
-/* ---------- STATE ---------- */
-const STORAGE_KEY = 'philigo_state_v2';
-let state = {
-  onboarded: false,
-  name: '',
-  age: '',
-  avatar: '🦁',
-  pin: '1234',
-  coins: 0,
-  streak: 0,
-  level: 1,
-  day: 1,
-  totalDays: 180,
-  pillsToday: [false, false, false, false],
-  totalPillsTaken: 0,
-  missedDoses: 0,
-  lastDate: null,
-  badges: [],
-  quizHighScore: 0,
-  gameHighScore: 0,
-};
-
-const PILLS_PER_DAY = 4;
-
-/* ---------- PERSISTENCE ---------- */
-function save() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e){}
-}
-function load() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) state = Object.assign(state, JSON.parse(raw));
-  } catch(e){}
-}
-
-/* ---------- HELPERS ---------- */
-function $(id){ return document.getElementById(id); }
-function toast(msg, dur=2000){
-  const t = $('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(t._t);
-  t._t = setTimeout(()=>t.classList.remove('show'), dur);
-}
-function showModal(icon, title, msg, btnText='OK'){
-  $('modalIcon').textContent = icon;
-  $('modalTitle').textContent = title;
-  $('modalMsg').textContent = msg;
-  $('modalBtn').textContent = btnText;
-  $('modalBack').classList.add('active');
-}
-function closeModal(){ $('modalBack').classList.remove('active'); }
-
-/* ---------- NAVIGATION ---------- */
-let currentScreen = 'home';
-function navigate(id){
-  // Hide all screens
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  // Show target
-  const target = $('screen-'+id);
-  if (!target) return;
-  target.classList.add('active');
-  currentScreen = id;
-
-  // Bottom nav visibility
-  const nav = $('bottomNav');
-  nav.style.display = (id==='game'||id==='puzzle'||id==='quiz'||id==='pin'||id==='parent') ? 'none' : 'flex';
-
-  // Update nav active
-  document.querySelectorAll('.nav-btn').forEach(b=>{
-    b.classList.toggle('active', b.dataset.nav === id);
-  });
-
-  // Screen-specific init
-  if (id === 'home') refreshHome();
-  if (id === 'rewards') refreshRewards();
-  if (id === 'puzzle') initPuzzle();
-  if (id === 'quiz') startQuiz();
-  if (id === 'parent') refreshParent();
-  if (id === 'pin') resetPin();
-  if (id === 'game') resetGameOverlays();
-}
-
-/* =========================================================
-   ONBOARDING
-   ========================================================= */
-let obStep = 0;
-function nextObStep(){
-  obStep = Math.min(2, obStep+1);
-  document.querySelectorAll('#onboarding .ob-step').forEach(s=>{
-    s.classList.toggle('active', parseInt(s.dataset.step)===obStep);
-  });
-}
-function prevObStep(){
-  obStep = Math.max(0, obStep-1);
-  document.querySelectorAll('#onboarding .ob-step').forEach(s=>{
-    s.classList.toggle('active', parseInt(s.dataset.step)===obStep);
-  });
-}
-function obStep2(){
-  const name = $('obName').value.trim();
-  const age = $('obAge').value.trim();
-  if (!name) { toast('Please enter your name'); return; }
-  if (!age || age<6 || age>15) { toast('Age must be 6–15'); return; }
-  state.name = name;
-  state.age = age;
-  nextObStep();
-}
-document.querySelectorAll('.avatar-opt').forEach(el=>{
-  el.addEventListener('click', ()=>{
-    document.querySelectorAll('.avatar-opt').forEach(a=>a.classList.remove('selected'));
-    el.classList.add('selected');
-    state.avatar = el.dataset.avatar;
-  });
-});
-function finishOnboarding(){
-  const pin = $('obPin').value.trim();
-  if (!/^\d{4}$/.test(pin)) { toast('PIN must be 4 digits'); return; }
-  state.pin = pin;
-  state.onboarded = true;
-  save();
-  $('onboarding').classList.remove('active');
-  refreshHome();
-  toast('Welcome, '+state.name+'! 🎉');
-}
-
-/* =========================================================
-   HOME
-   ========================================================= */
-function refreshHome(){
-  $('homeName').textContent = state.name || 'Friend';
-  $('homeAvatar').textContent = state.avatar || '🦁';
-  $('statCoins').textContent = state.coins;
-  $('statStreak').textContent = state.streak;
-  $('statLevel').textContent = state.level;
-
-  // Progress
-  const pct = Math.min(100, Math.round((state.day / state.totalDays) * 100));
-  $('progressRing').style.setProperty('--p', (pct*3.6)+'deg');
-  $('progressPct').textContent = pct+'%';
-  $('treatmentDay').textContent = `Day ${state.day} of ${state.totalDays} · Keep it up! 💪`;
-
-  // Pills
-  renderPillsToday();
-}
-
-function renderPillsToday(){
-  const wrap = $('pillsToday');
-  wrap.innerHTML = '';
-  const times = ['8AM','12PM','4PM','8PM'];
-  state.pillsToday.forEach((taken, i)=>{
-    const el = document.createElement('button');
-    el.className = 'pill-slot' + (taken?' taken':'');
-    el.innerHTML = `<div class="pill-emoji">💊</div><div>${times[i]}</div>`;
-    el.onclick = () => takePill(i);
-    wrap.appendChild(el);
-  });
-  const count = state.pillsToday.filter(Boolean).length;
-  $('pillsCount').textContent = `${count}/${PILLS_PER_DAY}`;
-}
-
-function takePill(i){
-  if (state.pillsToday[i]) { toast('Already taken! ✓'); return; }
-  state.pillsToday[i] = true;
-  state.coins += 1;
-  state.totalPillsTaken += 1;
-  state.streak += 1;
-
-  if (state.totalPillsTaken % 5 === 0) {
-    state.level += 1;
-    showModal('🎉','Level Up!','You reached level '+state.level+'! Keep going!');
-  } else {
-    toast('💊 Pill taken! +1 coin');
-  }
-
-  // Check all pills taken
-  if (state.pillsToday.every(Boolean)) {
-    setTimeout(()=>{
-      // advance day
-      state.day++;
-      state.pillsToday = [false,false,false,false];
-      state.streak = state.streak; // keep
-      checkBadges();
-      save();
-      renderPillsToday();
-      refreshHome();
-      showModal('🌟','Perfect Day!','You took all your pills today! Streak: '+state.streak+' 🔥');
-    }, 600);
-  } else {
-    save();
-    renderPillsToday();
-  }
-}
-
-/* =========================================================
-   GAME – PILL RUNNER
-   ========================================================= */
-const canvas = $('gameCanvas');
-const ctx = canvas.getContext('2d');
-let game = null;
-
-function resizeCanvas(){
-  const shell = $('gameShell');
-  if (!shell) return;
-  canvas.width = shell.clientWidth;
-  canvas.height = shell.clientHeight;
-}
-window.addEventListener('resize', resizeCanvas);
-
-function resetGameOverlays(){
-  $('gameStart').classList.add('active');
-  $('gameOver').classList.remove('active');
-  setTimeout(resizeCanvas, 50);
-}
-
-function startGame(){
-  $('gameStart').classList.remove('active');
-  $('gameOver').classList.remove('active');
-  resizeCanvas();
-
-  game = {
-    running: true,
-    t: 0,
-    speed: 4,
-    lane: 1, // 0 left, 1 mid, 2 right
-    x: canvas.width/2,
-    targetX: canvas.width/2,
-    playerY: canvas.height - 120,
-    pills: [],
-    obstacles: [],
-    spawnedAt: 0,
-    coins: 0,
-    pillsCount: 0,
-    spawnInterval: 900,
-    obstacleInterval: 1600,
-    lastSpawn: 0,
-    lastObstacle: 0,
-    keys: { left:false, right:false },
-  };
-
-  requestAnimationFrame(gameLoop);
-}
-
-function gameLoop(ts){
-  if (!game || !game.running) return;
-
-  const w = canvas.width, h = canvas.height;
-  const dt = 16;
-
-  game.t += dt;
-
-  // Move player toward target
-  const laneW = w / 3;
-  game.targetX = laneW * game.lane + laneW/2;
-  game.x += (game.targetX - game.x) * 0.2;
-
-  // Spawn pills
-  game.lastSpawn += dt;
-  if (game.lastSpawn > game.spawnInterval){
-    game.lastSpawn = 0;
-    game.spawnInterval = 700 + Math.random()*500;
-    const lane = Math.floor(Math.random()*3);
-    game.pills.push({
-      x: laneW*lane + laneW/2,
-      y: -30,
-      r: 14,
-      lane: lane,
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
     });
   }
-
-  // Spawn obstacles
-  game.lastObstacle += dt;
-  if (game.lastObstacle > game.obstacleInterval){
-    game.lastObstacle = 0;
-    game.obstacleInterval = 1400 + Math.random()*900;
-    const lane = Math.floor(Math.random()*3);
-    game.obstacles.push({
-      x: laneW*lane + laneW/2,
-      y: -40,
-      w: 40,
-      h: 40,
-      lane: lane,
-    });
-  }
-
-  // Update pills
-  for (let i=game.pills.length-1; i>=0; i--){
-    const p = game.pills[i];
-    p.y += game.speed + 2;
-    // Collision
-    if (Math.abs(p.y - game.playerY) < 30 && Math.abs(p.x - game.x) < 40){
-      game.pillsCount++;
-      game.coins++;
-      game.pills.splice(i,1);
-      state.coins++;
-      $('hudCoins').textContent = game.coins;
-      $('hudPills').textContent = game.pillsCount;
-      continue;
-    }
-    if (p.y > h + 30) game.pills.splice(i,1);
-  }
-
-  // Update obstacles
-  for (let i=game.obstacles.length-1; i>=0; i--){
-    const o = game.obstacles[i];
-    o.y += game.speed + 2;
-    if (Math.abs(o.y - game.playerY) < 35 && Math.abs(o.x - game.x) < 40){
-      // hit!
-      endGame();
-      return;
-    }
-    if (o.y > h + 50) game.obstacles.splice(i,1);
-  }
-
-  // Draw
-  drawGame(w, h);
-
-  requestAnimationFrame(gameLoop);
-}
-
-function drawGame(w, h){
-  // Sky gradient
-  const sky = ctx.createLinearGradient(0,0,0,h);
-  sky.addColorStop(0,'#87ceeb');
-  sky.addColorStop(0.7,'#b8e6c8');
-  sky.addColorStop(1,'#7fc99a');
-  ctx.fillStyle = sky;
-  ctx.fillRect(0,0,w,h);
-
-  // Road
-  ctx.fillStyle = '#3d5a4a';
-  ctx.fillRect(0, h-100, w, 100);
-  ctx.fillStyle = '#f4faf7';
-  // Road lines
-  const lineOffset = (game.t * 0.3) % 60;
-  for (let x = -60 + lineOffset; x < w+60; x += 60){
-    ctx.fillRect(x, h-54, 30, 5);
-  }
-
-  // Lane dividers
-  ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-  ctx.setLineDash([10,15]);
-  ctx.lineWidth = 2;
-  for (let i=1; i<3; i++){
-    ctx.beginPath();
-    ctx.moveTo(w/3*i, h-100);
-    ctx.lineTo(w/3*i, h);
-    ctx.stroke();
-  }
-  ctx.setLineDash([]);
-
-  // Pills
-  game.pills.forEach(p=>{
-    // shadow
-    ctx.beginPath();
-    ctx.arc(p.x, p.y+3, p.r, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(0,0,0,0.15)';
-    ctx.fill();
-    // pill body
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-    ctx.fillStyle = '#fff';
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(p.x-4, p.y-4, p.r-4, 0, Math.PI*2);
-    ctx.fillStyle = '#f39c12';
-    ctx.fill();
-    // sparkle
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 12px sans-serif';
-    ctx.fillText('💊', p.x-7, p.y+4);
-  });
-
-  // Obstacles
-  game.obstacles.forEach(o=>{
-    ctx.fillStyle = '#e74c3c';
-    ctx.beginPath();
-    ctx.roundRect(o.x-20, o.y-20, 40, 40, 8);
-    ctx.fill();
-    ctx.fillStyle = '#c0392b';
-    ctx.fillText('⚡', o.x-8, o.y+6);
-    ctx.font = 'bold 20px sans-serif';
-  });
-
-  // Player
-  ctx.font = '48px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('🏃', game.x, game.playerY+12);
-}
-
-function endGame(){
-  if (!game) return;
-  game.running = false;
-  const score = game.coins;
-  if (score > state.gameHighScore) state.gameHighScore = score;
-  state.streak = state.streak; // game doesn't affect streak
-  save();
-  $('finalScore').textContent = score;
-  $('finalPills').textContent = game.pillsCount;
-  $('gameOver').classList.add('active');
-  $('gameCoins').textContent = state.coins;
-}
-
-// Controls
-function moveLane(dir){
-  if (!game || !game.running) return;
-  game.lane = Math.max(0, Math.min(2, game.lane + dir));
-}
-$('gameShell').addEventListener('touchstart', e=>{
-  if (!game || !game.running) return;
-  const x = e.touches[0].clientX;
-  const w = canvas.width;
-  moveLane(x < w/2 ? -1 : 1);
-}, {passive:true});
-$('gameShell').addEventListener('click', e=>{
-  if (!game || !game.running) return;
-  const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  moveLane(x < rect.width/2 ? -1 : 1);
-});
-document.addEventListener('keydown', e=>{
-  if (currentScreen!=='game' || !game || !game.running) return;
-  if (e.key==='ArrowLeft') moveLane(-1);
-  if (e.key==='ArrowRight') moveLane(1);
-});
-
-/* =========================================================
-   PUZZLE (3x3 sliding)
-   ========================================================= */
-let puzzleState = [1,2,3,4,5,6,7,8,0];
-let puzzleMoves = 0;
-
-function initPuzzle(){
-  // Random shuffle (solvable)
-  do {
-    puzzleState = [1,2,3,4,5,6,7,8,0];
-    for (let i=0; i<200; i++){
-      const emptyIdx = puzzleState.indexOf(0);
-      const neighbors = getNeighbors(emptyIdx);
-      const swap = neighbors[Math.floor(Math.random()*neighbors.length)];
-      [puzzleState[emptyIdx], puzzleState[swap]] = [puzzleState[swap], puzzleState[emptyIdx]];
-    }
-  } while (isSolved());
-  puzzleMoves = 0;
-  $('puzzleMoves').textContent = '0';
-  renderPuzzle();
-}
-function getNeighbors(idx){
-  const r = Math.floor(idx/3), c = idx%3;
-  const out = [];
-  if (r>0) out.push(idx-3);
-  if (r<2) out.push(idx+3);
-  if (c>0) out.push(idx-1);
-  if (c<2) out.push(idx+1);
-  return out;
-}
-function renderPuzzle(){
-  const grid = $('puzzleGrid');
-  grid.innerHTML = '';
-  puzzleState.forEach((v,i)=>{
-    const el = document.createElement('button');
-    el.className = 'puzzle-tile' + (v===0?' empty':'');
-    el.textContent = v===0 ? '' : v;
-    el.onclick = ()=> tileClick(i);
-    grid.appendChild(el);
-  });
-}
-function tileClick(i){
-  const emptyIdx = puzzleState.indexOf(0);
-  const neighbors = getNeighbors(emptyIdx);
-  if (!neighbors.includes(i)) return;
-  [puzzleState[i], puzzleState[emptyIdx]] = [puzzleState[emptyIdx], puzzleState[i]];
-  puzzleMoves++;
-  $('puzzleMoves').textContent = puzzleMoves;
-  renderPuzzle();
-  if (isSolved()){
-    state.coins += 10;
-    save();
-    showModal('🧩','Puzzle Solved!','You earned 10 coins in '+puzzleMoves+' moves! 🎉');
-    $('statCoins').textContent = state.coins;
-  }
-}
-function isSolved(){
-  for (let i=0; i<8; i++) if (puzzleState[i] !== i+1) return false;
-  return puzzleState[8]===0;
-}
-
-/* =========================================================
-   QUIZ
-   ========================================================= */
-const QUIZ_QUESTIONS = [
-  {q:'How long does TB treatment usually last?', options:['1 week','6 months','1 year','3 days'], correct:1},
-  {q:'What should you do if you miss a pill?', options:['Skip it','Double the next dose','Tell your parent/clinic','Stop taking all pills'], correct:2},
-  {q:'Which drink is best to take with TB pills?', options:['Soda','Water','Energy drink','Coffee'], correct:1},
-  {q:'What colour might your urine turn on TB pills?', options:['Blue','Orange/red','Green','Purple'], correct:1},
-  {q:'Why must you finish all TB treatment?', options:['To get a sticker','To prevent drug resistance','Because it tastes nice','To please the nurse'], correct:1},
-];
-let quizIndex = 0, quizCorrect = 0, quizTotal = 0;
-
-function startQuiz(){
-  quizIndex = 0; quizCorrect = 0; quizTotal = QUIZ_QUESTIONS.length;
-  $('quizScore').textContent = '0';
-  showQuestion();
-}
-function showQuestion(){
-  if (quizIndex >= quizTotal){
-    finishQuiz();
-    return;
-  }
-  const q = QUIZ_QUESTIONS[quizIndex];
-  $('qNum').textContent = `Question ${quizIndex+1} of ${quizTotal}`;
-  $('qText').textContent = q.q;
-  $('quizBar').style.width = ((quizIndex/quizTotal)*100)+'%';
-
-  const opts = $('quizOptions');
-  opts.innerHTML = '';
-  q.options.forEach((opt, i)=>{
-    const btn = document.createElement('button');
-    btn.className = 'quiz-opt';
-    btn.innerHTML = `<span class="letter">${String.fromCharCode(65+i)}</span><span>${opt}</span>`;
-    btn.onclick = ()=> answerQuiz(i, q.correct, btn);
-    opts.appendChild(btn);
-  });
-}
-function answerQuiz(i, correct, btn){
-  const opts = document.querySelectorAll('.quiz-opt');
-  opts.forEach(o=>o.onclick = null);
-  if (i === correct){
-    btn.classList.add('correct');
-    quizCorrect++;
-    state.coins += 2;
-    $('quizScore').textContent = quizCorrect*2;
-    save();
-  } else {
-    btn.classList.add('wrong');
-    opts[correct].classList.add('correct');
-  }
-  setTimeout(()=>{
-    quizIndex++;
-    showQuestion();
-  }, 1200);
-}
-function finishQuiz(){
-  const pct = Math.round((quizCorrect/quizTotal)*100);
-  if (quizCorrect > state.quizHighScore) state.quizHighScore = quizCorrect;
-  save();
-  const icon = pct>=80?'🏆':pct>=60?'🎉':'💪';
-  showModal(icon, 'Quiz Complete!', `You got ${quizCorrect}/${quizTotal} correct (${pct}%). +${quizCorrect*2} coins!`);
-}
-
-/* =========================================================
-   REWARDS
-   ========================================================= */
-const BADGES = [
-  {id:'first_pill', name:'First Pill', icon:'💊', cond: s=>s.totalPillsTaken>=1},
-  {id:'week_warrior', name:'Week Warrior', icon:'🔥', cond: s=>s.streak>=7},
-  {id:'coin_collector', name:'Coin Collector', icon:'⭐', cond: s=>s.coins>=50},
-  {id:'quiz_master', name:'Quiz Master', icon:'🧠', cond: s=>s.quizHighScore>=4},
-  {id:'gamer', name:'Gamer', icon:'🎮', cond: s=>s.gameHighScore>=20},
-  {id:'month_hero', name:'Month Hero', icon:'🏅', cond: s=>s.day>=30},
-  {id:'level_5', name:'Level 5', icon:'🏆', cond: s=>s.level>=5},
-  {id:'streak_30', name:'Streak 30', icon:'💎', cond: s=>s.streak>=30},
-  {id:'champion', name:'Champion', icon:'👑', cond: s=>s.day>=90},
-];
-
-function checkBadges(){
-  BADGES.forEach(b=>{
-    if (!state.badges.includes(b.id) && b.cond(state)){
-      state.badges.push(b.id);
-      setTimeout(()=>showModal(b.icon, 'Badge Unlocked!', 'You earned: '+b.name), 800);
-    }
-  });
-  save();
-}
-
-function refreshRewards(){
-  $('rewardCoins').textContent = state.coins + ' Coins';
-  const grid = $('badgesGrid');
-  grid.innerHTML = '';
-  BADGES.forEach(b=>{
-    const unlocked = state.badges.includes(b.id);
-    const el = document.createElement('div');
-    el.className = 'badge-item ' + (unlocked?'unlocked':'locked');
-    el.innerHTML = `<div class="bi-icon">${unlocked?b.icon:'🔒'}</div><div class="bi-name">${b.name}</div>`;
-    grid.appendChild(el);
-  });
-}
-
-/* =========================================================
-   PARENT MODE (PIN GATE)
-   ========================================================= */
-let pinInput = '';
-function resetPin(){
-  pinInput = '';
-  updatePinDots();
-  $('pinError').textContent = '';
-  renderPinPad();
-}
-function renderPinPad(){
-  const pad = $('pinPad');
-  pad.innerHTML = '';
-  ['1','2','3','4','5','6','7','8','9','⌫','0','✓'].forEach(k=>{
-    const btn = document.createElement('button');
-    btn.className = 'pin-key' + (k==='⌫'?' del':'');
-    btn.textContent = k;
-    btn.onclick = ()=>{
-      if (k==='⌫'){ pinInput = pinInput.slice(0,-1); updatePinDots(); }
-      else if (k==='✓'){ submitPin(); }
-      else if (pinInput.length<4){ pinInput += k; updatePinDots(); if (pinInput.length===4) setTimeout(submitPin, 250); }
-    };
-    pad.appendChild(btn);
-  });
-}
-function updatePinDots(){
-  document.querySelectorAll('#pinDots .pd').forEach((d,i)=>{
-    d.classList.toggle('filled', i < pinInput.length);
-  });
-}
-function submitPin(){
-  if (pinInput === state.pin){
-    $('pinError').textContent = '';
-    pinInput = '';
-    updatePinDots();
-    navigate('parent');
-  } else {
-    $('pinError').textContent = 'Incorrect PIN. Try again.';
-    pinInput = '';
-    updatePinDots();
-    if (navigator.vibrate) navigator.vibrate(200);
-  }
-}
-function lockParent(){
-  showModal('🔒','Locked','Parent mode has been locked for security.');
-  setTimeout(()=>{ closeModal(); navigate('home'); }, 1200);
-}
-
-/* =========================================================
-   PARENT DASHBOARD
-   ========================================================= */
-function switchParentTab(tab){
-  document.querySelectorAll('.tab-bar button').forEach(b=>{
-    b.classList.toggle('active', b.dataset.tab===tab);
-  });
-  document.querySelectorAll('.tab-content').forEach(c=>{
-    c.classList.toggle('active', c.id==='tab-'+tab);
-  });
-}
-function refreshParent(){
-  $('parentChildName').textContent = state.name || 'your child';
-  $('totalPillsTaken').textContent = state.totalPillsTaken;
-  $('parentStreak').textContent = state.streak + ' days';
-  $('missedDoses').textContent = state.missedDoses;
-  $('parentDay').textContent = state.day + ' of ' + state.totalDays;
-
-  // Adherence rate
-  const totalPossible = state.day * PILLS_PER_DAY;
-  const rate = totalPossible > 0 ? Math.round((state.totalPillsTaken/totalPossible)*100) : 0;
-  $('adherenceRate').textContent = rate + '%';
-
-  // Week grid
-  const grid = $('weekGrid');
-  grid.innerHTML = '';
-  const days = ['M','T','W','T','F','S','S'];
-  const today = new Date().getDay(); // 0=Sun
-  const todayIdx = today===0?6:today-1;
-  days.forEach((d,i)=>{
-    let cls = '';
-    if (i < todayIdx) cls = Math.random() > 0.15 ? 'done' : 'missed';
-    else if (i === todayIdx) cls = state.pillsToday.filter(Boolean).length === PILLS_PER_DAY ? 'done' : '';
-    const el = document.createElement('div');
-    el.className = 'week-day ' + cls;
-    el.innerHTML = `<span class="wd-letter">${d}</span><div class="wd-dot"></div>`;
-    grid.appendChild(el);
-  });
-
-  // Alerts
-  const alerts = $('alertsList');
-  alerts.innerHTML = '';
-  if (state.missedDoses > 0){
-    alerts.innerHTML += `<div class="stat-row"><span class="sr-lbl">⚠️ ${state.missedDoses} missed dose(s)</span></div>`;
-  }
-  if (state.streak >= 7){
-    alerts.innerHTML += `<div class="stat-row"><span class="sr-lbl">🔥 ${state.streak}-day streak!</span></div>`;
-  }
-  if (!alerts.innerHTML){
-    alerts.innerHTML = '<div class="stat-row"><span class="sr-lbl">✅ All caught up!</span></div>';
-  }
-}
-
-/* =========================================================
-   INIT
-   ========================================================= */
-function init(){
-  load();
-
-  // Splash
-  setTimeout(()=>{
-    $('splash').classList.add('hide');
-    setTimeout(()=>{
-      $('splash').style.display = 'none';
-      if (!state.onboarded){
-        $('onboarding').classList.add('active');
-      } else {
-        refreshHome();
-      }
-    }, 500);
-  }, 1800);
-
-  // Polyfill roundRect
-  if (!CanvasRenderingContext2D.prototype.roundRect){
-    CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
-      this.beginPath();
-      this.moveTo(x+r,y);
-      this.arcTo(x+w,y,x+w,y+h,r);
-      this.arcTo(x+w,y+h,x,y+h,r);
-      this.arcTo(x,y+h,x,y,r);
-      this.arcTo(x,y,x+w,y,r);
-      this.closePath();
-      return this;
-    };
-  }
-}
-
-init();
-
-/* Prevent zoom on double-tap */
-let lastTouch = 0;
-document.addEventListener('touchend', e=>{
-  const now = Date.now();
-  if (now - lastTouch < 300) e.preventDefault();
-  lastTouch = now;
-}, {passive:false});
-
-/* Request notification permission (best-effort) */
-if ('Notification' in window && Notification.permission === 'default'){
-  setTimeout(()=>{ Notification.requestPermission().catch(()=>{}); }, 5000);
-}
 </script>
-
 </body>
 </html>
