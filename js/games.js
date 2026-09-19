@@ -1,9 +1,19 @@
 /* ============================================================
    PHILIGO — Games (Runner, Match-3, Memory, Quiz)
    ============================================================ */
+(function() {
 'use strict';
 
-const { state, save, ui, sound, haptic, app, checkAchievements, nav, $ } = window.__philigo;
+const P = window.__philigo;
+const state = P.state;
+const save = P.save;
+const ui = P.ui;
+const sound = P.sound;
+const haptic = P.haptic;
+const app = P.app;
+const checkAchievements = P.checkAchievements;
+const nav = P.nav;
+const $ = P.$;
 
 /* ============================================================
    GAME 1: PILL RUNNER (Endless Runner)
@@ -14,6 +24,7 @@ const Runner = (() => {
   let W = 0, H = 0;
   let game;
   let touchStartX = 0;
+  let bound = false;
 
   function resize() {
     const shell = document.querySelector('#sc-game-runner .game-shell');
@@ -27,20 +38,13 @@ const Runner = (() => {
 
   function initGame() {
     game = {
-      t: 0,
-      speed: 5,
-      lane: 1,
-      x: W / 2,
-      targetX: W / 2,
+      t: 0, speed: 5, lane: 1,
+      x: W / 2, targetX: W / 2,
       playerY: H - 120,
-      pills: [],
-      obstacles: [],
-      coins: 0,
-      pillsCount: 0,
-      lastSpawn: 0,
-      lastObstacle: 0,
-      spawnRate: 750,
-      obstacleRate: 1500,
+      pills: [], obstacles: [],
+      coins: 0, pillsCount: 0,
+      lastSpawn: 0, lastObstacle: 0,
+      spawnRate: 750, obstacleRate: 1500,
     };
     $('runnerCoins').textContent = '0';
     $('runnerPills').textContent = '0';
@@ -49,35 +53,25 @@ const Runner = (() => {
   function spawnPill() {
     const laneW = W / 3;
     const lane = Math.floor(Math.random() * 3);
-    game.pills.push({
-      x: laneW * lane + laneW / 2,
-      y: -30,
-      r: 14,
-    });
+    game.pills.push({ x: laneW * lane + laneW / 2, y: -30, r: 14 });
   }
 
   function spawnObstacle() {
     const laneW = W / 3;
     const lane = Math.floor(Math.random() * 3);
-    game.obstacles.push({
-      x: laneW * lane + laneW / 2,
-      y: -40,
-      size: 36,
-    });
+    game.obstacles.push({ x: laneW * lane + laneW / 2, y: -40, size: 36 });
   }
 
-  function loop(ts) {
+  function loop() {
     if (!running) return;
     const dt = 16;
     game.t += dt;
     game.speed = 5 + Math.min(8, game.t / 8000);
 
-    // Player follows lane
     const laneW = W / 3;
     game.targetX = laneW * game.lane + laneW / 2;
     game.x += (game.targetX - game.x) * 0.22;
 
-    // Spawns
     game.lastSpawn += dt;
     if (game.lastSpawn > game.spawnRate) {
       game.lastSpawn = 0;
@@ -91,7 +85,6 @@ const Runner = (() => {
       game.obstacleRate = Math.max(700, game.obstacleRate - 30);
     }
 
-    // Update pills
     for (let i = game.pills.length - 1; i >= 0; i--) {
       const p = game.pills[i];
       p.y += game.speed + 2;
@@ -107,7 +100,6 @@ const Runner = (() => {
       if (p.y > H + 30) game.pills.splice(i, 1);
     }
 
-    // Update obstacles
     for (let i = game.obstacles.length - 1; i >= 0; i--) {
       const o = game.obstacles[i];
       o.y += game.speed + 2;
@@ -123,7 +115,6 @@ const Runner = (() => {
   }
 
   function draw() {
-    // Sky
     const sky = ctx.createLinearGradient(0, 0, 0, H);
     sky.addColorStop(0, '#87ceeb');
     sky.addColorStop(0.7, '#b8e6c8');
@@ -131,14 +122,12 @@ const Runner = (() => {
     ctx.fillStyle = sky;
     ctx.fillRect(0, 0, W, H);
 
-    // Road
     ctx.fillStyle = '#3d5a4a';
     ctx.fillRect(0, H - 100, W, 100);
     ctx.fillStyle = '#f4faf7';
     const off = (game.t * 0.4) % 60;
     for (let x = -60 + off; x < W + 60; x += 60) ctx.fillRect(x, H - 54, 30, 5);
 
-    // Lane dividers
     ctx.strokeStyle = 'rgba(255,255,255,0.35)';
     ctx.setLineDash([10, 15]);
     ctx.lineWidth = 2;
@@ -150,14 +139,10 @@ const Runner = (() => {
     }
     ctx.setLineDash([]);
 
-    // Pills
     ctx.font = '26px sans-serif';
     ctx.textAlign = 'center';
-    game.pills.forEach(p => {
-      ctx.fillText('💊', p.x, p.y + 8);
-    });
+    game.pills.forEach(p => ctx.fillText('💊', p.x, p.y + 8));
 
-    // Obstacles
     game.obstacles.forEach(o => {
       ctx.fillStyle = '#e74c3c';
       ctx.beginPath();
@@ -167,7 +152,6 @@ const Runner = (() => {
       ctx.fillText('⚡', o.x, o.y + 8);
     });
 
-    // Player
     ctx.font = '52px sans-serif';
     ctx.fillText('🏃', game.x, game.playerY + 14);
   }
@@ -179,7 +163,6 @@ const Runner = (() => {
     haptic([200, 100, 200]);
     app.setHighscore('runner', game.coins);
     app.addCoins(game.coins);
-    state.totalPills += 0; // games don't affect treatment
     save();
     $('runnerFinalScore').textContent = game.coins;
     $('runnerFinalPills').textContent = game.pillsCount;
@@ -196,6 +179,7 @@ const Runner = (() => {
 
   function bindControls() {
     const shell = document.querySelector('#sc-game-runner .game-shell');
+    if (!shell) return;
     shell.addEventListener('touchstart', e => {
       if (!running) return;
       touchStartX = e.touches[0].clientX;
@@ -225,7 +209,7 @@ const Runner = (() => {
       ctx = canvas.getContext('2d');
       setTimeout(resize, 50);
       window.addEventListener('resize', resize);
-      if (!Runner._bound) { bindControls(); Runner._bound = true; }
+      if (!bound) { bindControls(); bound = true; }
     },
     start() {
       $('runnerStart').classList.remove('game-overlay--active');
@@ -250,6 +234,7 @@ const Runner = (() => {
 const Match3 = (() => {
   const COLS = 8, ROWS = 8;
   const ICONS = ['💊','🟢','🔴','🟡','🔵','🟣'];
+  const BGS = ['#fff5e6','#e6f5e6','#fde8e8','#fef9e7','#e6f0fb','#f3e8fb'];
   let grid = [];
   let selected = null;
   let score = 0;
@@ -260,12 +245,9 @@ const Match3 = (() => {
     grid = [];
     for (let r = 0; r < ROWS; r++) {
       const row = [];
-      for (let c = 0; c < COLS; c++) {
-        row.push(Math.floor(Math.random() * ICONS.length));
-      }
+      for (let c = 0; c < COLS; c++) row.push(Math.floor(Math.random() * ICONS.length));
       grid.push(row);
     }
-    // Remove initial matches
     let safety = 20;
     while (findMatches().length > 0 && safety-- > 0) {
       for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
@@ -276,7 +258,6 @@ const Match3 = (() => {
 
   function findMatches() {
     const matches = new Set();
-    // Horizontal
     for (let r = 0; r < ROWS; r++) {
       let run = 1;
       for (let c = 1; c <= COLS; c++) {
@@ -287,7 +268,6 @@ const Match3 = (() => {
         }
       }
     }
-    // Vertical
     for (let c = 0; c < COLS; c++) {
       let run = 1;
       for (let r = 1; r <= ROWS; r++) {
@@ -307,7 +287,7 @@ const Match3 = (() => {
     for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
       const el = document.createElement('div');
       el.className = 'match-tile';
-      el.style.background = tileBg(grid[r][c]);
+      el.style.background = BGS[grid[r][c] % BGS.length];
       el.textContent = ICONS[grid[r][c]];
       el.dataset.r = r; el.dataset.c = c;
       el.onclick = () => handleClick(r, c);
@@ -316,12 +296,6 @@ const Match3 = (() => {
     }
     $('matchScore').textContent = score;
     $('matchMoves').textContent = moves;
-  }
-
-  function tileBg(v) {
-    return [
-      '#fff5e6','#e6f5e6','#fde8e8','#fef9e7','#e6f0fb','#f3e8fb',
-    ][v % 6];
   }
 
   function handleClick(r, c) {
@@ -333,18 +307,13 @@ const Match3 = (() => {
       return;
     }
     const dr = Math.abs(selected.r - r), dc = Math.abs(selected.c - c);
-    if (dr + dc !== 1) {
-      selected = { r, c };
-      draw();
-      return;
-    }
-    // Swap
+    if (dr + dc !== 1) { selected = { r, c }; draw(); return; }
+
     const a = selected, b = { r, c };
     [grid[a.r][a.c], grid[b.r][b.c]] = [grid[b.r][b.c], grid[a.r][a.c]];
     selected = null;
     const matches = findMatches();
     if (matches.length === 0) {
-      // Swap back
       [grid[a.r][a.c], grid[b.r][b.c]] = [grid[b.r][b.c], grid[a.r][a.c]];
       sound.error();
       draw();
@@ -359,11 +328,8 @@ const Match3 = (() => {
   function resolveMatches() {
     busy = true;
     const matches = findMatches();
-    if (matches.length === 0) {
-      busy = false;
-      return;
-    }
-    // Pop animation
+    if (matches.length === 0) { busy = false; return; }
+
     matches.forEach(([r, c]) => {
       const idx = r * COLS + c;
       const el = $('matchGrid').children[idx];
@@ -371,10 +337,9 @@ const Match3 = (() => {
     });
     sound.pop(); haptic(15);
     score += matches.length * 10;
-    // After animation, drop
+
     setTimeout(() => {
       matches.forEach(([r, c]) => { grid[r][c] = -1; });
-      // Gravity
       for (let c = 0; c < COLS; c++) {
         const col = [];
         for (let r = ROWS - 1; r >= 0; r--) if (grid[r][c] !== -1) col.push(grid[r][c]);
@@ -397,7 +362,6 @@ const Match3 = (() => {
     hint() {
       if (state.coins < 5) return ui.toast('Need 5 coins');
       app.addCoins(-5);
-      // Find any valid swap
       for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
         const dirs = [[0,1],[1,0]];
         for (const [dr, dc] of dirs) {
@@ -406,10 +370,7 @@ const Match3 = (() => {
           [grid[r][c], grid[r2][c2]] = [grid[r2][c2], grid[r][c]];
           const ok = findMatches().length > 0;
           [grid[r][c], grid[r2][c2]] = [grid[r2][c2], grid[r][c]];
-          if (ok) {
-            ui.toast(`Try swapping (${r+1},${c+1})`);
-            return;
-          }
+          if (ok) { ui.toast(`Try swapping (${r+1},${c+1})`); return; }
         }
       }
     },
@@ -528,9 +489,9 @@ const Quiz = (() => {
     { q: 'What should you do if you miss a pill?', a: ['Skip it','Double the next dose','Tell your parent/nurse','Stop all pills'], correct: 2, exp: 'Always tell a trusted adult or your nurse.' },
     { q: 'Which drink is best with TB pills?', a: ['Soda','Water','Energy drink','Coffee'], correct: 1, exp: 'Water is always the best choice.' },
     { q: 'What color might your pee turn on TB pills?', a: ['Blue','Orange/red','Green','Purple'], correct: 1, exp: 'Rifampicin turns pee orange-red. This is normal!' },
-    { q: 'Why must you finish ALL TB treatment?', a: ['To get a sticker','To prevent drug resistance','Because it tastes nice','To please the nurse'], correct: 1, exp: 'Stopping early lets TB become stronger and harder to cure.' },
+    { q: 'Why must you finish ALL TB treatment?', a: ['To get a sticker','To prevent drug resistance','Because it tastes nice','To please the nurse'], correct: 1, exp: 'Stopping early lets TB become stronger.' },
     { q: 'Can TB be cured?', a: ['No, never','Yes, with medicine','Only in adults','Only with surgery'], correct: 1, exp: 'Yes! TB is curable with full treatment.' },
-    { q: 'How does TB spread?', a: ['Through food','Through the air','By touching','Through water'], correct: 1, exp: 'TB spreads through the air when someone coughs or sneezes.' },
+    { q: 'How does TB spread?', a: ['Through food','Through the air','By touching','Through water'], correct: 1, exp: 'TB spreads through the air.' },
     { q: 'When should you take your pills?', a: ['Only when sick','Every day at the same time','Once a week','When you remember'], correct: 1, exp: 'Take them every day at the same times.' },
     { q: 'What food helps your body fight TB?', a: ['Only sweets','Healthy food & veggies','Only meat','Only fruit'], correct: 1, exp: 'A balanced diet helps your body heal.' },
     { q: 'Who can you talk to about TB worries?', a: ['Nobody','Your nurse or parent','Only friends','Only the internet'], correct: 1, exp: 'Your nurse, doctor, and parents are there to help.' },
@@ -546,10 +507,7 @@ const Quiz = (() => {
   }
 
   function showQuestion() {
-    if (idx >= QUESTIONS.length) {
-      finish();
-      return;
-    }
+    if (idx >= QUESTIONS.length) { finish(); return; }
     const q = QUESTIONS[idx];
     $('quizNumText').textContent = idx + 1;
     $('quizQ').textContent = q.q;
@@ -610,11 +568,12 @@ const Quiz = (() => {
   };
 })();
 
-// Export for HTML onclick handlers
+// Expose to global for HTML onclick handlers
 window.Runner = Runner;
 window.Match3 = Match3;
 window.Memory = Memory;
 window.Quiz = Quiz;
-window.nav = window.__philigo.nav;
-window.ui = window.__philigo.ui;
-window.Parent = window.__philigo.Parent || Parent;
+window.nav = nav;
+window.ui = ui;
+
+})(); // end IIFE
