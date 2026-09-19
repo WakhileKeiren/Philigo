@@ -1,0 +1,26 @@
+{
+  "name": "PhiliGo — TB Adherence Adventure",
+  "short_name": "PhiliGo",
+  "description": "A gamified mobile app helping children in Eswatini stay on TB treatment.",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f7b5a",
+  "theme_color": "#0f7b5a",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "education", "games"]
+}

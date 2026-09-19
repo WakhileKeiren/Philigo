@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0f7b5a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="PhiliGo">
+<meta name="description" content="Gamified TB treatment adherence app for children in Eswatini">
+<title>PhiliGo — TB Adherence Adventure</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash" class="splash">
+  <div class="splash__icon">💊</div>
+  <h1 class="splash__title">Phili<span>Go</span></h1>
+  <p class="splash__tag">Your TB Adventure Awaits!</p>
+  <div class="splash__loader"><span></span></div>
+</div>
+
+<!-- ONBOARDING -->
+<div id="onboard" class="onboard">
+  <div class="onboard__step" data-step="0">
+    <div class="dots"><span class="active"></span><span></span><span></span></div>
+    <div class="onboard__hero">🦁</div>
+    <h2>Hi there, hero! 👋</h2>
+    <p>I'm <strong>Phili</strong> — your TB treatment buddy. Together we'll collect pills, beat levels, and stay strong!</p>
+    <div class="onboard__note">
+      <strong>⚕️ Note:</strong> PhiliGo helps you remember your medicine. Always listen to your nurse and parents!
+    </div>
+    <button class="btn btn--primary" onclick="ob.next()">Let's Go! 🚀</button>
+  </div>
+
+  <div class="onboard__step" data-step="1">
+    <div class="dots"><span></span><span class="active"></span><span></span></div>
+    <h2>What's your name?</h2>
+    <p>Your hero name.</p>
+    <label class="field">
+      <span>Hero Name</span>
+      <input id="obName" placeholder="e.g. Sipho" maxlength="20" autocomplete="given-name">
+    </label>
+    <label class="field">
+      <span>Age</span>
+      <input id="obAge" type="number" min="6" max="15" placeholder="8" inputmode="numeric">
+    </label>
+    <div class="onboard__btns">
+      <button class="btn btn--ghost" onclick="ob.prev()">Back</button>
+      <button class="btn btn--primary" onclick="ob.step2()">Next →</button>
+    </div>
+  </div>
+
+  <div class="onboard__step" data-step="2">
+    <div class="dots"><span></span><span></span><span class="active"></span></div>
+    <h2>Pick your hero! 🎭</h2>
+    <p>Choose your animal companion.</p>
+    <div id="avatarGrid" class="avatar-grid"></div>
+    <label class="field">
+      <span>Parent PIN (4 digits)</span>
+      <input id="obPin" type="tel" maxlength="4" inputmode="numeric" placeholder="1234">
+      <small>Used to open the parent dashboard</small>
+    </label>
+    <div class="onboard__btns">
+      <button class="btn btn--ghost" onclick="ob.prev()">Back</button>
+      <button class="btn btn--primary" onclick="ob.finish()">Start Playing! 🎮</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" class="app">
+
+  <!-- ============ SCREEN: HOME ============ -->
+  <section class="screen screen--active" id="sc-home">
+    <header class="home-header">
+      <div class="home-header__row">
+        <div>
+          <div class="home-header__greet">Hello, hero!</div>
+          <div class="home-header__name" id="homeName">Friend</div>
+        </div>
+        <div class="home-header__avatar" id="homeAvatar">🦁</div>
+      </div>
+      <div class="home-header__stats">
+        <div class="stat-bubble"><span>⭐</span><span id="statCoins">0</span></div>
+        <div class="stat-bubble"><span>🔥</span><span id="statStreak">0</span></div>
+        <div class="stat-bubble"><span>🏆</span><span id="statLevel">1</span></div>
+      </div>
+    </header>
+
+    <div class="progress-card">
+      <div class="progress-ring" id="progRing">
+        <span id="progPct">0%</span>
+      </div>
+      <div class="progress-card__txt">
+        <h4>Treatment Journey</h4>
+        <p id="treatInfo">Day 1 of 180</p>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <h3>💊 Today's Medicine</h3>
+      <span class="pill-count" id="pillCount">0/3</span>
+    </div>
+    <div class="pills-today" id="pillsToday"></div>
+
+    <div class="reminder-banner" id="reminderBanner">
+      <span class="reminder-banner__ico">⏰</span>
+      <div class="reminder-banner__txt">
+        <strong id="nextReminder">Next dose at 2:00 PM</strong>
+        <span>Don't forget your pill!</span>
+      </div>
+    </div>
+
+    <div class="section-head"><h3>🎮 Games</h3></div>
+    <div class="games-grid">
+      <button class="game-card game-card--orange" onclick="nav.go('game-runner')">
+        <span class="game-card__ico">🏃</span>
+        <span class="game-card__name">Pill Runner</span>
+        <span class="game-card__sub">Endless runner</span>
+        <span class="game-card__hi">Best: <span id="hi-runner">0</span></span>
+      </button>
+      <button class="game-card game-card--purple" onclick="nav.go('game-match')">
+        <span class="game-card__ico">🧩</span>
+        <span class="game-card__name">Pill Match</span>
+        <span class="game-card__sub">Match 3+</span>
+        <span class="game-card__hi">Best: <span id="hi-match">0</span></span>
+      </button>
+      <button class="game-card game-card--blue" onclick="nav.go('game-memory')">
+        <span class="game-card__ico">🎴</span>
+        <span class="game-card__name">Memory Cards</span>
+        <span class="game-card__sub">Find the pairs</span>
+        <span class="game-card__hi">Best: <span id="hi-memory">0</span></span>
+      </button>
+      <button class="game-card game-card--red" onclick="nav.go('game-quiz')">
+        <span class="game-card__ico">❓</span>
+        <span class="game-card__name">TB Quiz</span>
+        <span class="game-card__sub">Test your brain</span>
+        <span class="game-card__hi">Best: <span id="hi-quiz">0</span></span>
+      </button>
+    </div>
+
+    <div class="section-head">
+      <h3>🏅 Achievements</h3>
+      <span class="see-all" onclick="nav.go('rewards')">See all ›</span>
+    </div>
+    <div class="badges-mini" id="miniBadges"></div>
+  </section>
+
+  <!-- ============ SCREEN: RUNNER ============ -->
+  <section class="screen" id="sc-game-runner">
+    <div class="game-shell">
+      <div class="game-hud">
+        <button class="game-hud__back" onclick="nav.go('home')">←</button>
+        <div class="game-hud__stats">
+          <span class="hud-chip">⭐ <span id="runnerCoins">0</span></span>
+          <span class="hud-chip">💊 <span id="runnerPills">0</span></span>
+        </div>
+      </div>
+      <canvas id="runnerCanvas"></canvas>
+      <div class="game-overlay game-overlay--active" id="runnerStart">
+        <div class="game-overlay__ico">🏃</div>
+        <h2>Pill Runner</h2>
+        <p>Collect pills 💊 &nbsp;·&nbsp; Dodge obstacles ⚡<br>Tap or use arrow keys</p>
+        <button class="btn btn--primary" onclick="Runner.start()">Start Run 🏁</button>
+        <p class="game-overlay__hint">Controls: Tap left/right of screen or use ← → keys</p>
+      </div>
+      <div class="game-overlay" id="runnerOver">
+        <div class="game-overlay__ico">🏁</div>
+        <h2>Great run!</h2>
+        <div class="game-overlay__score" id="runnerFinalScore">0</div>
+        <p>Pills collected: <strong id="runnerFinalPills">0</strong></p>
+        <div class="game-overlay__btns">
+          <button class="btn btn--ghost" onclick="Runner.stopAndGoHome()">Home</button>
+          <button class="btn btn--primary" onclick="Runner.start()">Play Again 🔁</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN: MATCH-3 ============ -->
+  <section class="screen" id="sc-game-match">
+    <div class="game-shell game-shell--light">
+      <div class="game-hud game-hud--dark">
+        <button class="game-hud__back" onclick="nav.go('home')">←</button>
+        <div class="game-hud__stats">
+          <span class="hud-chip">⭐ <span id="matchScore">0</span></span>
+          <span class="hud-chip">🎯 <span id="matchMoves">0</span></span>
+        </div>
+      </div>
+      <div class="match-wrap">
+        <div class="match-grid" id="matchGrid"></div>
+        <div class="match-actions">
+          <button class="btn btn--ghost" onclick="Match3.restart()">🔄 New Game</button>
+          <button class="btn btn--primary" onclick="Match3.hint()">💡 Hint (-5⭐)</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN: MEMORY ============ -->
+  <section class="screen" id="sc-game-memory">
+    <div class="game-shell game-shell--light">
+      <div class="game-hud game-hud--dark">
+        <button class="game-hud__back" onclick="nav.go('home')">←</button>
+        <div class="game-hud__stats">
+          <span class="hud-chip">⭐ <span id="memScore">0</span></span>
+          <span class="hud-chip">🎯 <span id="memMoves">0</span></span>
+        </div>
+      </div>
+      <div class="memory-wrap">
+        <div class="memory-grid" id="memoryGrid"></div>
+        <div class="memory-info">
+          <span>Pairs found: <strong id="memPairs">0</strong>/8</span>
+          <span>Time: <strong id="memTime">0:00</strong></span>
+        </div>
+        <button class="btn btn--primary" onclick="Memory.restart()">🔄 New Game</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN: QUIZ ============ -->
+  <section class="screen" id="sc-game-quiz">
+    <div class="game-shell game-shell--light">
+      <div class="game-hud game-hud--dark">
+        <button class="game-hud__back" onclick="nav.go('home')">←</button>
+        <div class="game-hud__stats">
+          <span class="hud-chip">⭐ <span id="quizScore">0</span></span>
+          <span class="hud-chip">Q <span id="quizQNum">1</span>/10</span>
+        </div>
+      </div>
+      <div class="quiz-wrap">
+        <div class="quiz-progress"><div class="quiz-progress__bar" id="quizBar"></div></div>
+        <div class="quiz-card">
+          <div class="quiz-card__num">Question <span id="quizNumText">1</span></div>
+          <div class="quiz-card__q" id="quizQ">Loading...</div>
+        </div>
+        <div class="quiz-options" id="quizOptions"></div>
+        <div class="quiz-feedback" id="quizFeedback"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN: REWARDS ============ -->
+  <section class="screen" id="sc-rewards">
+    <div class="topbar">
+      <button class="topbar__back" onclick="nav.go('home')">←</button>
+      <h2>🏅 Achievements</h2>
+      <div class="topbar__spacer"></div>
+    </div>
+    <div class="rewards-header">
+      <div class="rewards-header__ico">🏆</div>
+      <h2 id="rewardCoins">0 Coins</h2>
+      <p>Keep playing & taking medicine!</p>
+    </div>
+    <div class="badges-grid" id="badgesGrid"></div>
+  </section>
+
+  <!-- ============ SCREEN: PARENT PIN ============ -->
+  <section class="screen" id="sc-pin">
+    <div class="topbar">
+      <button class="topbar__back" onclick="nav.go('home')">←</button>
+      <h2>🔒 Parent Access</h2>
+      <div class="topbar__spacer"></div>
+    </div>
+    <div class="pin-screen">
+      <div class="pin-screen__ico">🔐</div>
+      <h2>Enter Parent PIN</h2>
+      <p>For parents & healthcare providers</p>
+      <div class="pin-dots" id="pinDots">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <div class="pin-pad" id="pinPad"></div>
+      <div class="pin-error" id="pinError"></div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN: PARENT DASH ============ -->
+  <section class="screen" id="sc-parent">
+    <div class="topbar">
+      <button class="topbar__back" onclick="nav.go('home')">←</button>
+      <h2>👨‍👩‍👧 Parent Dashboard</h2>
+      <button class="topbar__lock" onclick="Parent.lock()">🔒</button>
+    </div>
+    <div class="parent-welcome">
+      <h2>Hello, Caregiver 👋</h2>
+      <p>Monitoring <strong id="parentChildName">your child</strong></p>
+    </div>
+
+    <div class="parent-tabs">
+      <button class="active" data-tab="adherence" onclick="Parent.tab('adherence')">📊 Adherence</button>
+      <button data-tab="education" onclick="Parent.tab('education')">📖 Learn</button>
+      <button data-tab="appointments" onclick="Parent.tab('appointments')">📅 Visits</button>
+    </div>
+
+    <div class="parent-tab active" id="tab-adherence">
+      <div class="week-grid" id="weekGrid"></div>
+      <div class="stat-panel">
+        <h4>📈 Statistics</h4>
+        <div class="stat-rows">
+          <div class="stat-row"><span>Adherence rate</span><strong id="pAdhRate">0%</strong></div>
+          <div class="stat-row"><span>Total pills taken</span><strong id="pTotal">0</strong></div>
+          <div class="stat-row"><span>Current streak</span><strong id="pStreak">0 days</strong></div>
+          <div class="stat-row"><span>Missed doses</span><strong class="red" id="pMissed">0</strong></div>
+          <div class="stat-row"><span>Treatment day</span><strong id="pDay">1 / 180</strong></div>
+        </div>
+      </div>
+      <div class="stat-panel">
+        <h4>🔔 Alerts</h4>
+        <div id="parentAlerts"></div>
+      </div>
+    </div>
+
+    <div class="parent-tab" id="tab-education">
+      <div class="edu-card">
+        <h4>💊 About TB Treatment</h4>
+        <ul>
+          <li>TB treatment lasts <strong>6 months (180 days)</strong></li>
+          <li>Pills must be taken <strong>every single day</strong></li>
+          <li>Never skip doses — TB can become resistant</li>
+          <li>Missing doses can cause treatment failure</li>
+        </ul>
+      </div>
+      <div class="edu-card">
+        <h4>⚠️ Common Side Effects</h4>
+        <ul>
+          <li>Nausea or upset stomach</li>
+          <li>Loss of appetite</li>
+          <li>Mild skin rash</li>
+          <li>Orange/red urine (normal — from rifampicin)</li>
+          <li>Tiredness</li>
+        </ul>
+        <div class="tip-box">💡 Give pills with food to reduce stomach upset</div>
+      </div>
+      <div class="edu-card edu-card--danger">
+        <h4>🚨 Seek Urgent Care</h4>
+        <ul>
+          <li>Difficulty breathing</li>
+          <li>Severe vomiting (can't keep pills down)</li>
+          <li>Yellowing of eyes or skin (jaundice)</li>
+          <li>Severe rash or swelling</li>
+          <li>Confusion or severe headache</li>
+        </ul>
+        <div class="tip-box tip-box--danger">🚨 Call your clinic immediately if any occur!</div>
+      </div>
+      <div class="edu-card">
+        <h4>🤝 Supporting Your Child</h4>
+        <ul>
+          <li>Praise every dose taken — celebrate wins</li>
+          <li>Play PhiliGo together during pill time</li>
+          <li>Link pill time to a daily routine</li>
+          <li>Never punish for missed doses — encourage</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="parent-tab" id="tab-appointments">
+      <div class="appt-card">
+        <div class="appt-card__date"><span>15</span><small>Jun</small></div>
+        <div class="appt-card__info">
+          <h4>Monthly Check-up</h4>
+          <p>10:00 AM · Mbabane TB Clinic<br>Dr. Nkosi · Room 4</p>
+          <span class="appt-card__badge">⏰ In 3 days</span>
+        </div>
+      </div>
+      <div class="appt-card">
+        <div class="appt-card__date"><span>22</span><small>Jul</small></div>
+        <div class="appt-card__info">
+          <h4>Sputum Test</h4>
+          <p>09:00 AM · Mbabane TB Clinic<br>Bring sample container</p>
+          <span class="appt-card__badge appt-card__badge--amber">📋 Bring sample</span>
+        </div>
+      </div>
+      <div class="stat-panel">
+        <h4>📞 Contact Provider</h4>
+        <div class="stat-rows">
+          <div class="stat-row"><span>📱 Phone</span><strong>+268 2404 1234</strong></div>
+          <div class="stat-row"><span>✉️ Email</span><strong style="font-size:11px;">tb.clinic@health.gov.sz</strong></div>
+          <div class="stat-row"><span>🚨 Emergency</span><strong class="red">+268 2404 9999</strong></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BOTTOM NAV ============ -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="nav-btn nav-btn--active" data-nav="home" onclick="nav.go('home')">
+      <span class="nav-btn__ico">🏠</span><span class="nav-btn__lbl">Home</span>
+    </button>
+    <button class="nav-btn" data-nav="rewards" onclick="nav.go('rewards')">
+      <span class="nav-btn__ico">🏅</span><span class="nav-btn__lbl">Rewards</span>
+    </button>
+    <button class="nav-btn" data-nav="pin" onclick="nav.go('pin')">
+      <span class="nav-btn__ico">👨‍👩‍👧</span><span class="nav-btn__lbl">Parent</span>
+    </button>
+  </nav>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<!-- MODAL -->
+<div id="modal" class="modal-back">
+  <div class="modal">
+    <div class="modal__ico" id="modalIco">🎉</div>
+    <h3 id="modalTitle">Great job!</h3>
+    <p id="modalMsg">Keep it up!</p>
+    <button class="btn btn--primary btn--full" onclick="ui.closeModal()">Awesome!</button>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script src="js/games.js"></script>
+<script>
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+  }
+</script>
+</body>
+</html>
