@@ -449,4 +449,7 @@ document.addEventListener('touchend', e => {
 window.addEventListener('DOMContentLoaded', init);
 
 // Export for games
-window.__philigo = { state, save, ui, sound, haptic, app, checkAchievements, nav, $, $$ };
+window.__philigo = { state, save, ui, sound, haptic, app, checkAchievements, nav, $, $$, Parent, ob, render };
+window.Parent = Parent;
+window.ob = ob;
+window.render = render;
