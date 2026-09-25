@@ -1,5 +1,5 @@
 # 💊 PhiliGo
-
+[![clinicians that code: verified builder](https://cliniciansthatcode.com/badge/verified.svg)](https://cliniciansthatcode.com/directory/#p-wakhile-keiren-mavimbela) 
 **Gamified TB treatment adherence app for children in Eswatini.**
 
 Built with HTML, CSS & vanilla JavaScript. No frameworks, no build step, no backend.
