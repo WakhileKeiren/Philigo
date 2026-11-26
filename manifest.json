@@ -1,7 +1,7 @@
 {
-  "name": "PhiliGo — TB Adherence Adventure",
+  "name": "PhiliGo (Phili+) — Pediatric Adherence Adventure",
   "short_name": "PhiliGo",
-  "description": "A gamified mobile app helping children in Eswatini stay on TB treatment.",
+  "description": "A gamified pediatric medication adherence app aligned with Eswatini clinical care principles.",
   "start_url": "./",
   "display": "standalone",
   "orientation": "portrait",
