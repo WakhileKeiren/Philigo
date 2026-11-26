@@ -6,46 +6,50 @@
 <meta name="theme-color" content="#0f7b5a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="PhiliGo">
-<meta name="description" content="Gamified TB treatment adherence app for children in Eswatini">
-<title>PhiliGo — TB Adherence Adventure</title>
+<meta name="description" content="Gamified pediatric medication adherence web app for Eswatini">
+<title>PhiliGo (Phili+) — Pediatric Adherence Adventure</title>
 <link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-<a href="https://cliniciansthatcode.com/directory/#p-wakhile-keiren-mavimbela"><img src="https://cliniciansthatcode.com/badge/verified.svg" alt="clinicians that code: verified builder" width="260" height="28"></a> 
+<a class="builder-badge" href="https://cliniciansthatcode.com/directory/#p-wakhile-keiren-mavimbela" target="_blank" rel="noopener">
+  <img src="https://cliniciansthatcode.com/badge/verified.svg" alt="clinicians that code: verified builder" width="220" height="24">
+</a>
+
 <!-- SPLASH -->
 <div id="splash" class="splash">
   <div class="splash__icon">💊</div>
-  <h1 class="splash__title">Phili<span>Go</span></h1>
-  <p class="splash__tag">Your TB Adventure Awaits!</p>
+  <h1 class="splash__title">Phili<span>Go</span> <small>Phili+</small></h1>
+  <p class="splash__tag">Smart Pediatric Adherence & Care Companion</p>
   <div class="splash__loader"><span></span></div>
 </div>
 
 <!-- ONBOARDING -->
 <div id="onboard" class="onboard">
   <div class="onboard__step active" data-step="0">
-    <div class="dots"><span class="active"></span><span></span><span></span></div>
+    <div class="dots"><span class="active"></span><span></span><span></span><span></span></div>
     <div class="onboard__hero">🦁</div>
-    <h2>Hi there, hero! 👋</h2>
-    <p>I'm <strong>Phili</strong> — your TB treatment buddy. Together we'll collect pills, beat levels, and stay strong!</p>
+    <h2>Welcome to PhiliGo! 👋</h2>
+    <p>I'm <strong>Phili</strong> — your health adventure buddy. Together we track daily doses, check symptoms safely, and unlock 15 mini-games!</p>
     <div class="onboard__note">
-      <strong>⚕️ Note:</strong> PhiliGo helps you remember your medicine. Always listen to your nurse and parents!
+      <strong>⚕️ Clinical Alignment:</strong> Guided by Eswatini STG &amp; EML (2021) adherence &amp; safety principles. Always follow your clinician's prescription.
     </div>
-    <button class="btn btn--primary" onclick="ob.next()">Let's Go! 🚀</button>
+    <button class="btn btn--primary" onclick="ob.next()">Start Setup 🚀</button>
   </div>
 
   <div class="onboard__step" data-step="1">
-    <div class="dots"><span></span><span class="active"></span><span></span></div>
-    <h2>What's your name?</h2>
-    <p>Your hero name.</p>
+    <div class="dots"><span></span><span class="active"></span><span></span><span></span></div>
+    <h2>Child Profile &amp; Age Tier</h2>
+    <p>Parent-entered age automatically sets the interface &amp; game tier (6–8, 9–12, or 13–16).</p>
     <label class="field">
-      <span>Hero Name</span>
+      <span>Child / Hero Name</span>
       <input id="obName" placeholder="e.g. Sipho" maxlength="20" autocomplete="given-name">
     </label>
     <label class="field">
-      <span>Age</span>
-      <input id="obAge" type="number" min="6" max="15" placeholder="8" inputmode="numeric">
+      <span>Child's Age (6–16 years)</span>
+      <input id="obAge" type="number" min="6" max="16" placeholder="9" inputmode="numeric" oninput="ob.previewTier()">
+      <small id="tierPreview">Enter age (6–16) to preview automatic experience tier</small>
     </label>
     <div class="onboard__btns">
       <button class="btn btn--ghost" onclick="ob.prev()">Back</button>
@@ -54,19 +58,60 @@
   </div>
 
   <div class="onboard__step" data-step="2">
-    <div class="dots"><span></span><span></span><span class="active"></span></div>
-    <h2>Pick your hero! 🎭</h2>
-    <p>Choose your animal companion.</p>
+    <div class="dots"><span></span><span></span><span class="active"></span><span></span></div>
+    <h2>Visual Medicine Setup 💊</h2>
+    <p>Pick your companion and select dosage forms using visual icons (no photo upload needed).</p>
     <div id="avatarGrid" class="avatar-grid"></div>
+    <div class="field">
+      <span>Visual Medicine Forms (Tap to Toggle)</span>
+      <div id="medFormGrid" class="med-form-grid"></div>
+    </div>
+    <div class="onboard__btns">
+      <button class="btn btn--ghost" onclick="ob.prev()">Back</button>
+      <button class="btn btn--primary" onclick="ob.step3()">Next →</button>
+    </div>
+  </div>
+
+  <div class="onboard__step" data-step="3">
+    <div class="dots"><span></span><span></span><span></span><span class="active"></span></div>
+    <h2>Security &amp; Offline Access 🔐</h2>
+    <p>Set a <strong>child local unlock PIN</strong> (works offline) and a <strong>separate caregiver password</strong>.</p>
     <label class="field">
-      <span>Parent PIN (4 digits)</span>
-      <input id="obPin" type="tel" maxlength="4" inputmode="numeric" placeholder="1234">
-      <small>Used to open the parent dashboard</small>
+      <span>Caregiver Phone Number (For Online OTP)</span>
+      <div class="otp-row">
+        <input id="obPhone" type="tel" placeholder="+268 7600 0000">
+        <button type="button" class="btn btn--ghost btn--sm" onclick="ob.sendOtp()">Send OTP</button>
+      </div>
+      <small id="otpStatus">Online verification required once; daily unlock works 100% offline.</small>
+    </label>
+    <label class="field">
+      <span>Child Offline Unlock PIN (4 digits)</span>
+      <input id="obChildPin" type="tel" maxlength="4" inputmode="numeric" placeholder="1234">
+    </label>
+    <label class="field">
+      <span>Separate Caregiver Portal Password</span>
+      <input id="obParentPass" type="password" minlength="4" placeholder="Create caregiver password">
+      <small>Distinct from the child's unlock PIN</small>
     </label>
     <div class="onboard__btns">
       <button class="btn btn--ghost" onclick="ob.prev()">Back</button>
-      <button class="btn btn--primary" onclick="ob.finish()">Start Playing! 🎮</button>
+      <button class="btn btn--primary" onclick="ob.finish()">Launch PhiliGo 🎮</button>
     </div>
+  </div>
+</div>
+
+<!-- OFFLINE CHILD LOCK SCREEN -->
+<div id="childLock" class="lock-overlay">
+  <div class="lock-card">
+    <div class="lock-card__ico">🛡️</div>
+    <h3>Offline Quick Unlock</h3>
+    <p id="lockModeText">Works offline with PIN or Passkey</p>
+    <input id="lockPinInput" type="password" maxlength="4" inputmode="numeric" placeholder="••••" class="lock-input">
+    <div class="lock-btns">
+      <button class="btn btn--primary btn--full" onclick="Lock.unlockPin()">Unlock with PIN</button>
+      <button class="btn btn--ghost btn--full" onclick="Lock.unlockPasskey()">🔑 Offline Passkey</button>
+    </div>
+    <small id="lockError" class="red-txt"></small>
   </div>
 </div>
 
@@ -78,10 +123,17 @@
     <header class="home-header">
       <div class="home-header__row">
         <div>
-          <div class="home-header__greet">Hello, hero!</div>
-          <div class="home-header__name" id="homeName">Friend</div>
+          <div class="home-header__greet" id="homeGreet">Hello, hero!</div>
+          <div class="home-header__name">
+            <span id="homeName">Friend</span>
+            <span class="tier-pill" id="homeTierBadge">Tier 9–12</span>
+          </div>
         </div>
-        <div class="home-header__avatar" id="homeAvatar">🦁</div>
+        <div class="header-actions">
+          <button class="icon-btn" title="Offline Mode Toggle" id="netToggle" onclick="app.toggleOffline()">📶</button>
+          <button class="icon-btn" title="Lock App" onclick="Lock.lock()">🔒</button>
+          <div class="home-header__avatar" id="homeAvatar">🦁</div>
+        </div>
       </div>
       <div class="home-header__stats">
         <div class="stat-bubble"><span>⭐</span><span id="statCoins">0</span></div>
@@ -95,52 +147,52 @@
         <span id="progPct">0%</span>
       </div>
       <div class="progress-card__txt">
-        <h4>Treatment Journey</h4>
+        <h4 id="journeyTitle">Treatment Journey</h4>
         <p id="treatInfo">Day 1 of 180</p>
+        <small id="tierGuidanceHint" class="muted-small">Guided daily dose tracking</small>
       </div>
     </div>
 
+    <!-- Contextual App / Phone Use Nudge -->
+    <div class="nudge-card" id="nudgeCard">
+      <div class="nudge-card__top">
+        <span>📱 <strong>Smart Activity Nudge</strong></span>
+        <button class="nudge-sim-btn" onclick="app.triggerNudge()">Simulate App Nudge</button>
+      </div>
+      <p id="nudgeText">Active on phone/social apps? Phili nudges you gently at dose time without exposing private details.</p>
+    </div>
+
     <div class="section-head">
-      <h3>💊 Today's Medicine</h3>
+      <h3>💊 Today's Scheduled Medicine</h3>
       <span class="pill-count" id="pillCount">0/3</span>
     </div>
     <div class="pills-today" id="pillsToday"></div>
 
-    <div class="reminder-banner" id="reminderBanner">
-      <span class="reminder-banner__ico">⏰</span>
-      <div class="reminder-banner__txt">
-        <strong id="nextReminder">Next dose at 2:00 PM</strong>
-        <span>Don't forget your pill!</span>
+    <!-- PRN As-Needed Safe Logging & Symptom Check-in -->
+    <div class="section-head">
+      <h3>🩺 PRN (As-Needed) &amp; Check-In</h3>
+      <span class="pill-count pill-count--blue">Safe Log +5⭐</span>
+    </div>
+    <div class="prn-card">
+      <p id="prnDesc">Need an as-needed inhaler puff or reliever dose? Log safely and complete a quick symptom check.</p>
+      <div class="prn-actions">
+        <button class="btn btn--ghost btn--sm" onclick="app.openPrnModal()">💨 Log PRN + Symptom Check</button>
       </div>
     </div>
 
-    <div class="section-head"><h3>🎮 Games</h3></div>
-    <div class="games-grid">
-      <button class="game-card game-card--orange" onclick="nav.go('game-runner')">
-        <span class="game-card__ico">🏃</span>
-        <span class="game-card__name">Pill Runner</span>
-        <span class="game-card__sub">Endless runner</span>
-        <span class="game-card__hi">Best: <span id="hi-runner">0</span></span>
-      </button>
-      <button class="game-card game-card--purple" onclick="nav.go('game-match')">
-        <span class="game-card__ico">🧩</span>
-        <span class="game-card__name">Pill Match</span>
-        <span class="game-card__sub">Match 3+</span>
-        <span class="game-card__hi">Best: <span id="hi-match">0</span></span>
-      </button>
-      <button class="game-card game-card--blue" onclick="nav.go('game-memory')">
-        <span class="game-card__ico">🎴</span>
-        <span class="game-card__name">Memory Cards</span>
-        <span class="game-card__sub">Find the pairs</span>
-        <span class="game-card__hi">Best: <span id="hi-memory">0</span></span>
-      </button>
-      <button class="game-card game-card--red" onclick="nav.go('game-quiz')">
-        <span class="game-card__ico">❓</span>
-        <span class="game-card__name">TB Quiz</span>
-        <span class="game-card__sub">Test your brain</span>
-        <span class="game-card__hi">Best: <span id="hi-quiz">0</span></span>
-      </button>
+    <div class="reminder-banner" id="reminderBanner">
+      <span class="reminder-banner__ico">🔔</span>
+      <div class="reminder-banner__txt">
+        <strong id="nextReminder">Next dose at 2:00 PM</strong>
+        <span id="anonClinicPreview">Upcoming reminder: Scheduled wellness check (details hidden)</span>
+      </div>
     </div>
+
+    <div class="section-head">
+      <h3>🎮 15 Mini-Games</h3>
+      <span class="pill-count" id="gameTierLabel">All Unlocked</span>
+    </div>
+    <div class="games-grid" id="gamesGrid"></div>
 
     <div class="section-head">
       <h3>🏅 Achievements</h3>
@@ -153,7 +205,7 @@
   <section class="screen" id="sc-game-runner">
     <div class="game-shell">
       <div class="game-hud">
-        <button class="game-hud__back" onclick="nav.go('home')">←</button>
+        <button class="game-hud__back" onclick="Runner.stopAndGoHome()">←</button>
         <div class="game-hud__stats">
           <span class="hud-chip">⭐ <span id="runnerCoins">0</span></span>
           <span class="hud-chip">💊 <span id="runnerPills">0</span></span>
@@ -163,15 +215,14 @@
       <div class="game-overlay game-overlay--active" id="runnerStart">
         <div class="game-overlay__ico">🏃</div>
         <h2>Pill Runner</h2>
-        <p>Collect pills 💊 &nbsp;·&nbsp; Dodge obstacles ⚡<br>Tap or use arrow keys</p>
+        <p>Collect visual doses 💊 &nbsp;·&nbsp; Dodge germs ⚡<br>Tap left/right or use ← → keys</p>
         <button class="btn btn--primary" onclick="Runner.start()">Start Run 🏁</button>
-        <p class="game-overlay__hint">Controls: Tap left/right of screen or use ← → keys</p>
       </div>
       <div class="game-overlay" id="runnerOver">
         <div class="game-overlay__ico">🏁</div>
         <h2>Great run!</h2>
         <div class="game-overlay__score" id="runnerFinalScore">0</div>
-        <p>Pills collected: <strong id="runnerFinalPills">0</strong></p>
+        <p>Doses collected: <strong id="runnerFinalPills">0</strong></p>
         <div class="game-overlay__btns">
           <button class="btn btn--ghost" onclick="Runner.stopAndGoHome()">Home</button>
           <button class="btn btn--primary" onclick="Runner.start()">Play Again 🔁</button>
@@ -213,7 +264,7 @@
       <div class="memory-wrap">
         <div class="memory-grid" id="memoryGrid"></div>
         <div class="memory-info">
-          <span>Pairs found: <strong id="memPairs">0</strong>/8</span>
+          <span>Pairs: <strong id="memPairs">0</strong>/8</span>
           <span>Time: <strong id="memTime">0:00</strong></span>
         </div>
         <button class="btn btn--primary" onclick="Memory.restart()">🔄 New Game</button>
@@ -243,6 +294,20 @@
     </div>
   </section>
 
+  <!-- ============ SCREEN: MINI-GAME ARENA (GAMES 5–15) ============ -->
+  <section class="screen" id="sc-game-arena">
+    <div class="game-shell game-shell--light">
+      <div class="game-hud game-hud--dark">
+        <button class="game-hud__back" onclick="Arena.exit()">←</button>
+        <div class="game-hud__stats">
+          <span class="hud-chip" id="arenaTitleChip">Mini-Game</span>
+          <span class="hud-chip">⭐ <span id="arenaScore">0</span></span>
+        </div>
+      </div>
+      <div class="arena-wrap" id="arenaBody"></div>
+    </div>
+  </section>
+
   <!-- ============ SCREEN: REWARDS ============ -->
   <section class="screen" id="sc-rewards">
     <div class="topbar">
@@ -253,132 +318,150 @@
     <div class="rewards-header">
       <div class="rewards-header__ico">🏆</div>
       <h2 id="rewardCoins">0 Coins</h2>
-      <p>Keep playing & taking medicine!</p>
+      <p>Earned from scheduled doses, safe PRN check-ins &amp; 15 mini-games!</p>
     </div>
     <div class="badges-grid" id="badgesGrid"></div>
   </section>
 
-  <!-- ============ SCREEN: PARENT PIN ============ -->
+  <!-- ============ SCREEN: CAREGIVER AUTH & RECOVERY ============ -->
   <section class="screen" id="sc-pin">
     <div class="topbar">
       <button class="topbar__back" onclick="nav.go('home')">←</button>
-      <h2>🔒 Parent Access</h2>
+      <h2>🔒 Caregiver Portal</h2>
       <div class="topbar__spacer"></div>
     </div>
     <div class="pin-screen">
-      <div class="pin-screen__ico">🔐</div>
-      <h2>Enter Parent PIN</h2>
-      <p>For parents & healthcare providers</p>
-      <div class="pin-dots" id="pinDots">
-        <span></span><span></span><span></span><span></span>
+      <div class="pin-screen__ico">🛡️</div>
+      <h2>Caregiver Password</h2>
+      <p>Separate authentication from child's unlock PIN</p>
+      <div class="auth-box">
+        <input id="parentPassInput" type="password" placeholder="Enter caregiver password" class="auth-input" onkeydown="if(event.key==='Enter')Parent.login()">
+        <button class="btn btn--primary btn--full" onclick="Parent.login()">Unlock Dashboard</button>
+        <button class="btn btn--ghost btn--full" onclick="Parent.toggleRecovery()">Forgot Password / Changed Phone?</button>
       </div>
-      <div class="pin-pad" id="pinPad"></div>
       <div class="pin-error" id="pinError"></div>
+
+      <!-- Recovery Panel -->
+      <div id="recoveryBox" class="recovery-box" style="display:none;">
+        <h4>🔑 Caregiver Account Recovery</h4>
+        <p>Reset caregiver password or update phone number (simulated OTP recovery):</p>
+        <input id="recPhone" type="tel" placeholder="New or existing phone (+268...)" class="auth-input">
+        <input id="recNewPass" type="password" placeholder="New caregiver password" class="auth-input">
+        <button class="btn btn--primary btn--full" onclick="Parent.recoverAccount()">Verify &amp; Reset Password</button>
+      </div>
     </div>
   </section>
 
-  <!-- ============ SCREEN: PARENT DASH ============ -->
+  <!-- ============ SCREEN: PARENT DASHBOARD ============ -->
   <section class="screen" id="sc-parent">
     <div class="topbar">
       <button class="topbar__back" onclick="nav.go('home')">←</button>
-      <h2>👨‍👩‍👧 Parent Dashboard</h2>
+      <h2>👨‍👩‍👧 Caregiver Portal</h2>
       <button class="topbar__lock" onclick="Parent.lock()">🔒</button>
     </div>
     <div class="parent-welcome">
-      <h2>Hello, Caregiver 👋</h2>
-      <p>Monitoring <strong id="parentChildName">your child</strong></p>
+      <h2>Caregiver Dashboard 👋</h2>
+      <p>Monitoring <strong id="parentChildName">your child</strong> · <span id="parentTierTag">Tier 9–12</span></p>
     </div>
 
     <div class="parent-tabs">
-      <button class="active" data-tab="adherence" onclick="Parent.tab('adherence')">📊 Adherence</button>
-      <button data-tab="education" onclick="Parent.tab('education')">📖 Learn</button>
+      <button class="active" data-tab="adherence" onclick="Parent.tab('adherence')">📊 Logs &amp; Audit</button>
+      <button data-tab="education" onclick="Parent.tab('education')">📖 STG Guide</button>
       <button data-tab="appointments" onclick="Parent.tab('appointments')">📅 Visits</button>
     </div>
 
     <div class="parent-tab active" id="tab-adherence">
       <div class="week-grid" id="weekGrid"></div>
+
+      <!-- Power-Outage Backfill Card -->
       <div class="stat-panel">
-        <h4>📈 Statistics</h4>
+        <h4>⚡ Power-Outage Retroactive Backfill</h4>
+        <p class="muted-small" style="margin-bottom:10px;">Back-fill missed logs after load-shedding/outages. Every entry records <strong>who</strong> logged it and <strong>when</strong> for clinician review.</p>
+        <div class="backfill-form">
+          <input id="bfDate" type="date" class="auth-input">
+          <select id="bfSlot" class="auth-input">
+            <option value="Morning Dose (08:00)">Morning Dose (08:00)</option>
+            <option value="Afternoon Dose (14:00)">Afternoon Dose (14:00)</option>
+            <option value="Evening Dose (20:00)">Evening Dose (20:00)</option>
+          </select>
+          <input id="bfReason" type="text" placeholder="Note (e.g., Power outage / battery died)" class="auth-input">
+          <button class="btn btn--primary btn--full" onclick="Parent.addBackfill()">+ Record Retroactive Dose</button>
+        </div>
+      </div>
+
+      <div class="stat-panel">
+        <h4>📈 Adherence Summary</h4>
         <div class="stat-rows">
           <div class="stat-row"><span>Adherence rate</span><strong id="pAdhRate">0%</strong></div>
-          <div class="stat-row"><span>Total pills taken</span><strong id="pTotal">0</strong></div>
+          <div class="stat-row"><span>Total scheduled doses</span><strong id="pTotal">0</strong></div>
+          <div class="stat-row"><span>PRN check-ins logged</span><strong id="pPrnCount">0</strong></div>
           <div class="stat-row"><span>Current streak</span><strong id="pStreak">0 days</strong></div>
-          <div class="stat-row"><span>Missed doses</span><strong class="red" id="pMissed">0</strong></div>
           <div class="stat-row"><span>Treatment day</span><strong id="pDay">1 / 180</strong></div>
         </div>
       </div>
+
       <div class="stat-panel">
-        <h4>🔔 Alerts</h4>
-        <div id="parentAlerts"></div>
+        <h4>🧾 Clinician Audit Trail (Who &amp; When)</h4>
+        <div id="auditLogList" class="audit-list"></div>
       </div>
     </div>
 
     <div class="parent-tab" id="tab-education">
       <div class="edu-card">
-        <h4>💊 About TB Treatment</h4>
+        <h4>💊 Eswatini STG &amp; EML (2021) Care Principles</h4>
         <ul>
-          <li>TB treatment lasts <strong>6 months (180 days)</strong></li>
-          <li>Pills must be taken <strong>every single day</strong></li>
-          <li>Never skip doses — TB can become resistant</li>
-          <li>Missing doses can cause treatment failure</li>
+          <li>Complete the full prescribed duration (e.g., <strong>6 months / 180 days</strong> for standard TB therapy) even when feeling better.</li>
+          <li>Daily adherence prevents drug resistance and relapse.</li>
+          <li>Cross-check weight-based paediatric dosing with the <strong>Eswatini Paediatric Standard Treatment Guidelines</strong> at each clinic review.</li>
+          <li>Pair pharmacotherapy with non-pharmacological support: balanced nutrition, clean water, ventilation, and trigger avoidance (for asthma/inhalers).</li>
         </ul>
       </div>
       <div class="edu-card">
-        <h4>⚠️ Common Side Effects</h4>
+        <h4>💨 Visual Dosage &amp; Inhaler Technique</h4>
         <ul>
-          <li>Nausea or upset stomach</li>
-          <li>Loss of appetite</li>
-          <li>Mild skin rash</li>
-          <li>Orange/red urine (normal — from rifampicin)</li>
-          <li>Tiredness</li>
+          <li><strong>Tablets / Dispersible Tablets:</strong> Dissolve dispersible paediatric tablets in clean water as instructed.</li>
+          <li><strong>Syrups:</strong> Shake well and measure with an oral syringe, never a household spoon.</li>
+          <li><strong>Inhalers + Spacer:</strong> Shake inhaler, seal lips around spacer mouthpiece, actuate once, and take 5 slow breaths.</li>
+         <li><strong>Expected harmless effect (Rifampicin):</strong> Orange/red urine, tears, or sweat is normal.</li>
         </ul>
-        <div class="tip-box">💡 Give pills with food to reduce stomach upset</div>
+        <div class="tip-box">💡 Give medicines at consistent daily anchor times (breakfast, after school, bedtime).</div>
       </div>
       <div class="edu-card edu-card--danger">
-        <h4>🚨 Seek Urgent Care</h4>
+        <h4>🚨 Danger Signs — Refer Immediately</h4>
         <ul>
-          <li>Difficulty breathing</li>
-          <li>Severe vomiting (can't keep pills down)</li>
-          <li>Yellowing of eyes or skin (jaundice)</li>
-          <li>Severe rash or swelling</li>
-          <li>Confusion or severe headache</li>
+          <li>Fast or difficult breathing, chest indrawing, or blue lips</li>
+          <li>Persistent vomiting (unable to keep medicines down)</li>
+          <li>Yellowing of eyes or skin (jaundice) or dark tea-colored urine</li>
+          <li>Severe skin rash, facial swelling, or vision changes</li>
+          <li>Lethargy, confusion, or severe headache</li>
         </ul>
-        <div class="tip-box tip-box--danger">🚨 Call your clinic immediately if any occur!</div>
-      </div>
-      <div class="edu-card">
-        <h4>🤝 Supporting Your Child</h4>
-        <ul>
-          <li>Praise every dose taken — celebrate wins</li>
-          <li>Play PhiliGo together during pill time</li>
-          <li>Link pill time to a daily routine</li>
-          <li>Never punish for missed doses — encourage</li>
-        </ul>
+        <div class="tip-box tip-box--danger">🚨 Visit your nearest Eswatini clinic or hospital immediately if any danger sign appears!</div>
       </div>
     </div>
 
     <div class="parent-tab" id="tab-appointments">
-      <div class="appt-card">
-        <div class="appt-card__date"><span>15</span><small>Jun</small></div>
-        <div class="appt-card__info">
-          <h4>Monthly Check-up</h4>
-          <p>10:00 AM · Mbabane TB Clinic<br>Dr. Nkosi · Room 4</p>
-          <span class="appt-card__badge">⏰ In 3 days</span>
-        </div>
+      <div class="appt-privacy-note">
+        🔒 <strong>Privacy-First Reminders:</strong> Notification banners stay anonymous on lock screens so sensitive clinical details remain private.
       </div>
       <div class="appt-card">
-        <div class="appt-card__date"><span>22</span><small>Jul</small></div>
+        <div class="appt-card__date"><span>15</span><small>Next</small></div>
         <div class="appt-card__info">
-          <h4>Sputum Test</h4>
-          <p>09:00 AM · Mbabane TB Clinic<br>Bring sample container</p>
-          <span class="appt-card__badge appt-card__badge--amber">📋 Bring sample</span>
+          <h4>Scheduled Clinic Review</h4>
+          <p>10:00 AM · Paediatric Outpatient Clinic<br>Weight check &amp; refill review</p>
+          <span class="appt-card__badge">🔔 Anonymous lock-screen alert active</span>
         </div>
       </div>
       <div class="stat-panel">
-        <h4>📞 Contact Provider</h4>
+        <h4>⚙️ App Settings &amp; Nudges</h4>
         <div class="stat-rows">
-          <div class="stat-row"><span>📱 Phone</span><strong>+268 2404 1234</strong></div>
-          <div class="stat-row"><span>✉️ Email</span><strong style="font-size:11px;">tb.clinic@health.gov.sz</strong></div>
-          <div class="stat-row"><span>🚨 Emergency</span><strong class="red">+268 2404 9999</strong></div>
+          <div class="stat-row">
+            <span>App/Social Media Activity Nudges</span>
+            <button class="btn btn--ghost btn--sm" id="nudgeToggleBtn" onclick="Parent.toggleNudges()">Enabled</button>
+          </div>
+          <div class="stat-row">
+            <span>Reset Demo Data</span>
+            <button class="btn btn--ghost btn--sm red-txt" onclick="Parent.resetDemo()">Reset</button>
+          </div>
         </div>
       </div>
     </div>
@@ -393,9 +476,32 @@
       <span class="nav-btn__ico">🏅</span><span class="nav-btn__lbl">Rewards</span>
     </button>
     <button class="nav-btn" data-nav="pin" onclick="nav.go('pin')">
-      <span class="nav-btn__ico">👨‍👩‍👧</span><span class="nav-btn__lbl">Parent</span>
+      <span class="nav-btn__ico">👨‍👩‍👧</span><span class="nav-btn__lbl">Caregiver</span>
     </button>
   </nav>
+</div>
+
+<!-- PRN SYMPTOM CHECK-IN MODAL -->
+<div id="prnModal" class="modal-back">
+  <div class="modal">
+    <div class="modal__ico">💨</div>
+    <h3>Safe PRN &amp; Symptom Check</h3>
+    <p>Select your visual device/medicine and current symptom level to earn +5 safe-logging coins.</p>
+    <select id="prnMedSelect" class="auth-input">
+      <option value="Reliever Inhaler (Blue)">💨 Reliever Inhaler (Blue)</option>
+      <option value="Oral Syrup Dose">🧴 Oral Syrup Dose</option>
+      <option value="PRN Tablet">💊 PRN Tablet</option>
+    </select>
+    <select id="prnSymptomSelect" class="auth-input">
+      <option value="Mild symptoms — feeling better">😊 Mild — feeling better after dose</option>
+      <option value="Moderate cough/wheeze — resting">😐 Moderate — resting &amp; monitoring</option>
+      <option value="Severe distress — alert caregiver">🚨 Severe — notify caregiver immediately</option>
+    </select>
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button class="btn btn--ghost btn--full" onclick="app.closePrnModal()">Cancel</button>
+      <button class="btn btn--primary btn--full" onclick="app.submitPrn()">Save Check-In</button>
+    </div>
+  </div>
 </div>
 
 <!-- TOAST -->
@@ -410,19 +516,8 @@
     <button class="btn btn--primary btn--full" onclick="ui.closeModal()">Awesome!</button>
   </div>
 </div>
-  
+
 <script src="js/app.js"></script>
 <script src="js/games.js"></script>
-  
 </body>
-  <script>
-window.onerror = function(msg, src, line, col, err) {
-  alert('ERROR: ' + msg + '\nAt: ' + src + ':' + line);
-  document.body.innerHTML = '<pre style="padding:20px;color:red;background:#fff;font-size:12px;">ERROR: ' + msg + '\n\n' + (err && err.stack ? err.stack : '') + '</pre>';
-};
-window.addEventListener('unhandledrejection', function(e) {
-  alert('PROMISE ERROR: ' + (e.reason && e.reason.message ? e.reason.message : e.reason));
-});
-</script>
-  
 </html>
